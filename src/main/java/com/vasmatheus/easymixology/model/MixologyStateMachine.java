@@ -81,14 +81,16 @@ public class MixologyStateMachine {
 
     }
 
+    // TODO: It's unnecessary to do this on every render cycle
     public Set<PotionComponent> getComponentsToAdd() {
         var targetPotion = getTargetPotion();
-        var componentsToAdd = new HashSet<>(Arrays.asList(targetPotion.firstComponent, targetPotion.secondComponent, targetPotion.thirdComponent));
+        var componentsToAdd = new ArrayList<>(Arrays.asList(targetPotion.firstComponent, targetPotion.secondComponent,
+                targetPotion.thirdComponent));
 
         componentsToAdd.remove(variablesSnapshot.componentInFirstMixer);
         componentsToAdd.remove(variablesSnapshot.componentInSecondMixer);
 
-        return componentsToAdd;
+        return new HashSet<>(componentsToAdd);
     }
 
     public String getNextStep() {
