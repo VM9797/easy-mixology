@@ -11,9 +11,8 @@ import net.runelite.client.ui.overlay.outline.ModelOutlineRenderer;
 
 import javax.inject.Inject;
 import java.awt.*;
-import java.util.Objects;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import java.util.HashSet;
+import java.util.Set;
 
 public class EasyMixologyOverlay3D extends Overlay {
     @Inject
@@ -25,8 +24,7 @@ public class EasyMixologyOverlay3D extends Overlay {
     @Inject
     private EasyMixologyConfig config;
 
-    GameObject conveyorBeltOne;
-    GameObject conveyorBeltTwo;
+    Set<GameObject> conveyorBelts = new HashSet<>();
 
     GameObject lyeLever;
     DecorativeObject agaLever;
@@ -92,8 +90,6 @@ public class EasyMixologyOverlay3D extends Overlay {
     }
 
     private void drawConveyorBelt() {
-        var conveyorBelts = Stream.of(conveyorBeltOne, conveyorBeltTwo).filter(Objects::nonNull).collect(Collectors.toList());
-
         for (var conveyorBelt : conveyorBelts) {
             outlineObject(conveyorBelt, config.conveyorBeltOutline());
         }

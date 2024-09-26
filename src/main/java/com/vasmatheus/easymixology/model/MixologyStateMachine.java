@@ -47,17 +47,6 @@ public class MixologyStateMachine {
         return order.mostValuablePotionRefinement;
     }
 
-    public void tickUpdate() {
-//        if (!isStarted) {
-//            return;
-//        }
-//        var orderFromVarbits = MixologyOrder.fromVarbits(client);
-//
-//        if (state == MixologyState.WAITING_TO_START && orderFromVarbits.doesEqual(order) && order.isValidOrder) {
-//            state = MixologyState.MIXING;
-//        }
-    }
-
     public void stop() {
         isStarted = false;
         order = MixologyOrder.EMPTY;

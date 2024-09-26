@@ -31,7 +31,7 @@ public class EasyMixologyPlugin extends Plugin {
     private Client client;
 
     @Inject
-    private MixologyStateMachine machine;
+    private MixologyStateMachine mixologyStateMachine;
 
     @Inject
     private EasyMixologyOverlay3D overlay3D;
@@ -80,16 +80,21 @@ public class EasyMixologyPlugin extends Plugin {
     }
 
     @Subscribe
+    public void onDecorativeObjectDespawned(DecorativeObjectDespawned event) {
+        var object = event.getDecorativeObject();
+
+        if (object.getId() == MixologyIDs.AGA_LEVER) {
+            overlay3D.agaLever = null;
+        }
+    }
+
+    @Subscribe
     public void onGameObjectSpawned(GameObjectSpawned event) {
         var object = event.getGameObject();
 
         switch (object.getId()) {
             case MixologyIDs.CONVEYOR_BELT:
-                if (overlay3D.conveyorBeltOne == null) {
-                    overlay3D.conveyorBeltOne = object;
-                } else if (overlay3D.conveyorBeltTwo == null) {
-                    overlay3D.conveyorBeltTwo = object;
-                }
+                overlay3D.conveyorBelts.add(object);
                 break;
             case MixologyIDs.LYE_LEVER:
                 overlay3D.lyeLever = object;
@@ -137,7 +142,31 @@ public class EasyMixologyPlugin extends Plugin {
 
     @Subscribe
     public void onGameObjectDespawned(GameObjectDespawned event) {
-        // TODO: Add cleanup code
+        var object = event.getGameObject();
+
+        switch (object.getId()) {
+            case MixologyIDs.CONVEYOR_BELT:
+                overlay3D.conveyorBelts.remove(object);
+                break;
+            case MixologyIDs.LYE_LEVER:
+                overlay3D.lyeLever = null;
+                break;
+            case MixologyIDs.MOX_LEVER:
+                overlay3D.moxLever = null;
+                break;
+            case MixologyIDs.ALEMBIC:
+                overlay3D.alembic = null;
+                break;
+            case MixologyIDs.AGITATOR:
+                overlay3D.agitator = null;
+                break;
+            case MixologyIDs.RETORT:
+                overlay3D.retort = null;
+                break;
+            case MixologyIDs.VESSEL:
+                overlay3D.vessel = null;
+                break;
+        }
     }
 
     @Subscribe
@@ -147,7 +176,6 @@ public class EasyMixologyPlugin extends Plugin {
     @Subscribe
     public void onGameTick(GameTick event) {
         Widget mixologyWidget = client.getWidget(MixologyIDs.MIXOLOGY_WIDGET_ID);
-        machine.tickUpdate();
 
         if (mixologyWidget != null) {
             inArea = true;
@@ -156,14 +184,14 @@ public class EasyMixologyPlugin extends Plugin {
                 areaBootstrapTickCounter--;
 
                 if (areaBootstrapTickCounter < 0) {
-                    machine.start();
+                    mixologyStateMachine.start();
                 }
             }
         } else {
             if (inArea) {
                 inArea = false;
                 areaBootstrapTickCounter = ARE_BOOTSTRAP_TICK_COUNTER_START;
-                machine.stop();
+                mixologyStateMachine.stop();
             }
         }
     }
@@ -182,7 +210,7 @@ public class EasyMixologyPlugin extends Plugin {
     @Subscribe
     public void onVarbitChanged(VarbitChanged event) {
         if (MixologyVarbits.isRelevantVarbit(event.getVarbitId())) {
-            machine.onVarbitsUpdated();
+            mixologyStateMachine.onVarbitsUpdated();
         }
     }
 
