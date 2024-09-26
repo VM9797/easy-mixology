@@ -4,6 +4,7 @@ import com.google.inject.Provides;
 import com.vasmatheus.easymixology.constants.MixologyIDs;
 import com.vasmatheus.easymixology.constants.MixologyVarbits;
 import com.vasmatheus.easymixology.model.MixologyStateMachine;
+import com.vasmatheus.easymixology.model.MixologyStats;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
 import net.runelite.api.events.*;
@@ -31,10 +32,16 @@ public class EasyMixologyPlugin extends Plugin {
     private Client client;
 
     @Inject
-    private MixologyStateMachine mixologyStateMachine;
+    private MixologyStateMachine state;
+
+    @Inject
+    private MixologyStats stats;
 
     @Inject
     private EasyMixologyOverlay3D overlay3D;
+
+    @Inject
+    private EasyMixologyOverlay2D overlay2D;
 
     @Inject
     private OverlayManager overlayManager;
@@ -48,12 +55,13 @@ public class EasyMixologyPlugin extends Plugin {
     @Override
     protected void startUp() throws Exception {
         overlayManager.add(overlay3D);
+        overlayManager.add(overlay2D);
     }
 
     @Override
     protected void shutDown() throws Exception {
         overlayManager.remove(overlay3D);
-
+        overlayManager.remove(overlay2D);
     }
 
     @Subscribe
@@ -100,6 +108,9 @@ public class EasyMixologyPlugin extends Plugin {
             case MixologyIDs.VESSEL:
                 overlay3D.vessel = object;
                 break;
+            case MixologyIDs.HOPPER:
+                overlay3D.hopper = object;
+                break;
         }
     }
 
@@ -129,6 +140,9 @@ public class EasyMixologyPlugin extends Plugin {
             case MixologyIDs.VESSEL:
                 overlay3D.vessel = null;
                 break;
+            case MixologyIDs.HOPPER:
+                overlay3D.hopper = null;
+                break;
         }
     }
 
@@ -143,14 +157,14 @@ public class EasyMixologyPlugin extends Plugin {
                 areaBootstrapTickCounter--;
 
                 if (areaBootstrapTickCounter < 0) {
-                    mixologyStateMachine.start();
+                    state.start();
                 }
             }
         } else {
             if (inArea) {
                 inArea = false;
                 areaBootstrapTickCounter = ARE_BOOTSTRAP_TICK_COUNTER_START;
-                mixologyStateMachine.stop();
+                state.stop();
             }
         }
     }
@@ -158,15 +172,21 @@ public class EasyMixologyPlugin extends Plugin {
     @Subscribe
     public void onVarbitChanged(VarbitChanged event) {
         if (MixologyVarbits.isRelevantVarbit(event.getVarbitId())) {
-            mixologyStateMachine.update();
+            state.update();
+            stats.updateVarbits();
         }
+    }
+
+    @Subscribe
+    public void onChatMessage(ChatMessage event) {
+        stats.processChatMessage(event);
     }
 
     @Subscribe
     public void onConfigChanged(ConfigChanged configChanged)
     {
         if (configChanged.getGroup().equals(EasyMixologyConfig.GROUP)) {
-            clientThread.invoke(() -> mixologyStateMachine.update());
+            clientThread.invoke(() -> state.update());
         }
     }
 

@@ -32,6 +32,7 @@ public interface EasyMixologyConfig extends Config {
     String highlightStyleSection = "highlightStyleSection";
 
     @ConfigItem(
+            position = 0,
             keyName = "potionSelectionStrategy",
             name = "Potion strategy",
             description = "Which strategy should the plugin use to select the target potion to make. For Prefer Retort, XP is used as a " +
@@ -41,6 +42,90 @@ public interface EasyMixologyConfig extends Config {
     default PotionSelectionStrategy potionSelectionStrategy()
     {
         return PotionSelectionStrategy.HIGHEST_XP;
+    }
+
+    @ConfigItem(
+            position = 1,
+            keyName = "isOverlayEnabled",
+            name = "Infobox enabled",
+            description = "Toggles to display the minigame infobox or not",
+            section = optionsSection
+    )
+    default boolean isOverlayEnabled()
+    {
+        return true;
+    }
+
+    @ConfigItem(
+            position = 2,
+            keyName = "isLeverHighlightEnabled",
+            name = "Lever highlight",
+            description = "Toggles to highlight the lever or not",
+            section = optionsSection
+    )
+    default boolean isLeverHighlightEnabled()
+    {
+        return true;
+    }
+
+    @ConfigItem(
+            position = 3,
+            keyName = "isVesselHighlightEnabled",
+            name = "Vessel highlight",
+            description = "Toggles to highlight the vessel or not",
+            section = optionsSection
+    )
+    default boolean isVesselHighlightEnabled()
+    {
+        return true;
+    }
+
+    @ConfigItem(
+            position = 4,
+            keyName = "isStationHighlightEnabled",
+            name = "Refinery highlight",
+            description = "Toggles to highlight the refinery stations or not. Speedup highlight has a different toggle!",
+            section = optionsSection
+    )
+    default boolean isStationHighlightEnabled()
+    {
+        return true;
+    }
+
+    @ConfigItem(
+            position = 5,
+            keyName = "isStationSpeedupHighlightEnabled",
+            name = "Refinery speedup highlight",
+            description = "Toggles to highlight the refinery stations or not when speedup is possible",
+            section = optionsSection
+    )
+    default boolean isStationSpeedupHighlightEnabled()
+    {
+        return true;
+    }
+
+    @ConfigItem(
+            position = 6,
+            keyName = "isConveyorBeltHighlightEnabled",
+            name = "Conveyor belt highlight",
+            description = "Toggles to highlight the conveyor belts or not",
+            section = optionsSection
+    )
+    default boolean isConveyorBeltHighlightEnabled()
+    {
+        return true;
+    }
+
+    @ConfigItem(
+            position = 7,
+            keyName = "isEmptyHopperHighlightEnabled",
+            name = "Low hopper highlight",
+            description = "Toggles to highlight the low level hopper or not",
+            section = optionsSection
+    )
+    default boolean isEmptyHopperHighlightEnabled()
+    {
+        return true;
     }
 
 
@@ -126,6 +211,18 @@ public interface EasyMixologyConfig extends Config {
     )
     default Color conveyorBeltOutline() {
         return Color.YELLOW;
+    }
+
+    @Alpha
+    @ConfigItem(
+            position = 7,
+            keyName = "hopperDepositNeededOutline",
+            name = "Hopper deposit outline",
+            description = "Color to use to outline the hopper when it's contents are insufficient for the mixed potion",
+            section = highlightColorSection
+    )
+    default Color hopperDepositNeededOutline() {
+        return Color.RED;
     }
 
     @Alpha

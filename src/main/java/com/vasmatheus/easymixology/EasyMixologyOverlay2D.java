@@ -1,0 +1,93 @@
+package com.vasmatheus.easymixology;
+
+import com.vasmatheus.easymixology.model.MixologyStateMachine;
+import com.vasmatheus.easymixology.model.MixologyStats;
+import com.vasmatheus.easymixology.model.enums.PotionComponent;
+import net.runelite.client.ui.overlay.OverlayPanel;
+import net.runelite.client.ui.overlay.OverlayPosition;
+import net.runelite.client.ui.overlay.components.LineComponent;
+import net.runelite.client.ui.overlay.components.TitleComponent;
+
+import javax.inject.Inject;
+import java.awt.*;
+
+public class EasyMixologyOverlay2D extends OverlayPanel {
+    private static final int PREFERRED_WIDTH = 375;
+    private static final String MOX_COLOR = "0000FF";
+    private static final String AGA_COLOR = "00FF00";
+    private static final String LYE_COLOR = "FF0000";
+
+    @Inject
+    private MixologyStateMachine state;
+
+    @Inject
+    private MixologyStats stats;
+
+    @Inject
+    private EasyMixologyConfig config;
+
+    public EasyMixologyOverlay2D() {
+        super();
+        setPosition(OverlayPosition.TOP_CENTER);
+        setPreferredSize(new Dimension(PREFERRED_WIDTH, 0));
+    }
+
+    @Override
+    public Dimension render(Graphics2D graphics) {
+        if (!state.isStarted() || !config.isOverlayEnabled()) {
+            return super.render(graphics);
+        }
+
+        var targetPotion = state.getTargetPotion();
+
+        panelComponent.getChildren().add(TitleComponent.builder()
+                .text("Easy Mixology")
+                .color(Color.GREEN)
+                .build());
+
+        panelComponent.getChildren().add(LineComponent.builder()
+                .left("Player points")
+                .right(colorCodeString(stats.getPlayerMoxCount() == -1 ? "?" : String.valueOf(stats.getPlayerMoxCount()), MOX_COLOR) + " / " +
+                        colorCodeString(stats.getPlayerAgaCount() == -1 ? "?" : String.valueOf(stats.getPlayerAgaCount()), AGA_COLOR) + " / " +
+                        colorCodeString(stats.getPlayerLyeCount() == -1 ? "?" : String.valueOf(stats.getPlayerLyeCount()), LYE_COLOR))
+                .build());
+
+        panelComponent.getChildren().add(LineComponent.builder()
+                .left("Strategy")
+                .right(config.potionSelectionStrategy().toString())
+                .build());
+
+
+        panelComponent.getChildren().add(LineComponent.builder()
+                .left("Stage")
+                .right(state.getState().toString())
+                .build());
+
+        panelComponent.getChildren().add(LineComponent.builder()
+                .left("Refinery")
+                .right(state.getTargetRefinementType().toString())
+                .build());
+
+        panelComponent.getChildren().add(LineComponent.builder()
+                .left("Potion")
+                .right(targetPotion.toString())
+                .build());
+
+        panelComponent.getChildren().add(LineComponent.builder()
+                .left("Component")
+                .right(colorCodePotionComponent(targetPotion.firstComponent) + " / " + colorCodePotionComponent(targetPotion.secondComponent) + " / " + colorCodePotionComponent(targetPotion.thirdComponent))
+                .build());
+
+        return super.render(graphics);
+    }
+
+    private static String colorCodePotionComponent(PotionComponent component) {
+        String color = component == PotionComponent.AGA ? AGA_COLOR : component == PotionComponent.LYE ? LYE_COLOR : MOX_COLOR;
+
+        return colorCodeString(component.toString(), color);
+    }
+
+    private static String colorCodeString(String text, String colorCode) {
+        return "<col=" + colorCode + ">" + text + "<col=FFFFFF>";
+    }
+}

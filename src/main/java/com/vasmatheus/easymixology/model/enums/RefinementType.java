@@ -1,16 +1,16 @@
 package com.vasmatheus.easymixology.model.enums;
 
+import lombok.AllArgsConstructor;
+
+@AllArgsConstructor
 public enum RefinementType {
-    AGITATOR(1),
-    RETORT(2),
-    ALEMBIC(3),
-    NONE(0);
+    AGITATOR("Agitator", 1),
+    RETORT("Retort", 2),
+    ALEMBIC("Alembic", 3),
+    NONE("", 0);
 
+    public final String displayName;
     public final int varbitValue;
-
-    RefinementType(int varbitValue) {
-        this.varbitValue = varbitValue;
-    }
 
     public static RefinementType fromVarbitValue(int varbitValue) {
         switch (varbitValue) {
@@ -23,5 +23,10 @@ public enum RefinementType {
             default:
                 return NONE;
         }
+    }
+
+    @Override
+    public String toString() {
+        return displayName;
     }
 }
