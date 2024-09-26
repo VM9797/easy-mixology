@@ -1,11 +1,10 @@
 package com.vasmatheus.easymixology;
 
+import com.vasmatheus.easymixology.constants.MixologyIDs;
 import com.vasmatheus.easymixology.model.MixologyStateMachine;
 import com.vasmatheus.easymixology.model.enums.PotionComponent;
 import com.vasmatheus.easymixology.model.enums.RefinementType;
-import net.runelite.api.DecorativeObject;
-import net.runelite.api.GameObject;
-import net.runelite.api.TileObject;
+import net.runelite.api.*;
 import net.runelite.client.ui.overlay.Overlay;
 import net.runelite.client.ui.overlay.outline.ModelOutlineRenderer;
 
@@ -23,6 +22,9 @@ public class EasyMixologyOverlay3D extends Overlay {
 
     @Inject
     private EasyMixologyConfig config;
+
+    @Inject
+    private Client client;
 
     Set<GameObject> conveyorBelts = new HashSet<>();
 
@@ -65,7 +67,25 @@ public class EasyMixologyOverlay3D extends Overlay {
         var targetRefinery = state.getTargetRefinementType() == RefinementType.AGITATOR ? agitator :
                 state.getTargetRefinementType() == RefinementType.ALEMBIC ? alembic : retort;
 
+        if (isGraphicsObjectPresent(MixologyIDs.ALEMBIC_SPEEDUP_OBJECT_ID) && targetRefinery == alembic) {
+            outlineObject(targetRefinery, config.refinerySpeedupOutline());
+            return;
+        }
+        else if (isGraphicsObjectPresent(MixologyIDs.AGITATOR_SPEEDUP_OBJECT_ID) && targetRefinery == agitator) {
+            outlineObject(targetRefinery, config.refinerySpeedupOutline());
+            return;
+        }
+
         outlineObject(targetRefinery, preDraw ? config.refineryPreOutline() : config.refineryOutline());
+    }
+
+    private boolean isGraphicsObjectPresent(int graphicsObjectId) {
+        for (GraphicsObject graphicsObject : client.getGraphicsObjects()) {
+            if (graphicsObject.getId() == graphicsObjectId) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private void drawVessel() {
@@ -80,7 +100,7 @@ public class EasyMixologyOverlay3D extends Overlay {
 
         for (var component : componentsToAdd) {
             if (component == PotionComponent.LYE && lyeLever != null) {
-                outlineObject(lyeLever,config.lyeLeverOutline());
+                outlineObject(lyeLever, config.lyeLeverOutline());
             } else if (component == PotionComponent.AGA && agaLever != null) {
                 outlineObject(agaLever, config.agaLeverOutline());
             } else if (component == PotionComponent.MOX && moxLever != null) {

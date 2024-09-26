@@ -128,6 +128,18 @@ public interface EasyMixologyConfig extends Config {
         return Color.YELLOW;
     }
 
+    @Alpha
+    @ConfigItem(
+            position = 5,
+            keyName = "refinerySpeedupOutline",
+            name = "Refinery speedup outline",
+            description = "Color to use to outline the agitator or alembic station when speedup action is possible",
+            section = highlightColorSection
+    )
+    default Color refinerySpeedupOutline() {
+        return Color.CYAN;
+    }
+
     @ConfigItem(
             position = 0,
             keyName = "outlineFeather",

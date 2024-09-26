@@ -14,6 +14,9 @@ public class MixologyIDs {
 
     public static final int VESSEL = 55395;
 
+    public static final int AGITATOR_SPEEDUP_OBJECT_ID = 2954;
+    public static final int ALEMBIC_SPEEDUP_OBJECT_ID = 2955;
+
     // Parent ID 57802753
     public static final int MIXOLOGY_WIDGET_ID = 57802754;
 }
