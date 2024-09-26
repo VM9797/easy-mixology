@@ -1,4 +1,4 @@
-package com.example;
+package com.vasmatheus.easymixology;
 
 import com.google.common.base.Strings;
 import com.google.inject.Provides;
@@ -6,6 +6,10 @@ import com.google.inject.Provides;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 
+import com.vasmatheus.easymixology.constants.MixologyIDs;
+import com.vasmatheus.easymixology.constants.MixologyVarbits;
+import com.vasmatheus.easymixology.model.MixologyStateMachine;
+import com.vasmatheus.easymixology.model.enums.MixologyState;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.*;
 import net.runelite.api.events.*;
@@ -13,42 +17,51 @@ import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
+import net.runelite.client.ui.overlay.OverlayManager;
+
+import java.util.stream.Collectors;
 
 @Slf4j
 @PluginDescriptor(
-        name = "Example"
+        name = "Easy Mixology",
+        description = "Helper plugin to improve experience for Mastering Mixology minigame",
+        tags = {"mastering", "mixology", "minigame", "herblore", "alchemy", "lab", "herb", "paste", "mox", "lye", "aga", "potion"}
 )
-public class ExamplePlugin extends Plugin {
+public class EasyMixologyPlugin extends Plugin {
     @Inject
     private Client client;
 
     @Inject
-    private ExampleConfig config;
+    private MixologyStateMachine machine;
 
-    private HelperObject helperObject;
+    @Inject
+    private EasyMixologyOverlay3D overlay3D;
 
-    private MixologyStateMachine machine = new MixologyStateMachine();
-    private MixologyState lastState = machine.getState();
+    @Inject
+    private OverlayManager overlayManager;
+
+    private MixologyState lastState = MixologyState.WAITING_TO_START;
 
     @Override
     protected void startUp() throws Exception {
         log.info("Example started!");
+
+        if (machine != null) {
+            lastState = machine.getState();
+        }
+
+        overlayManager.add(overlay3D);
     }
 
     @Override
     protected void shutDown() throws Exception {
         log.info("Example stopped!");
+        overlayManager.remove(overlay3D);
+
     }
 
     @Subscribe
     public void onGameStateChanged(GameStateChanged gameStateChanged) {
-        if (gameStateChanged.getGameState() == GameState.LOGGED_IN) {
-            client.addChatMessage(ChatMessageType.GAMEMESSAGE, "", "Example says " + config.greeting(), null);
-            log("VARBITS", "MIXER LEFT: " + client.getVarbitValue(MixologyVarbits.MIXER_LEFT));
-            log("VARBITS", "MIXER RIGHT: " + client.getVarbitValue(MixologyVarbits.MIXER_MIDDLE));
-            log("VARBITS", "MIXER MIDDLE: " + client.getVarbitValue(MixologyVarbits.MIXER_RIGHT));
-            log("VARBITS", "POTION ORDER THIRD POT: " + client.getVarbitValue(MixologyVarbits.ORDER_THIRD_POTION));
-        }
     }
 
     @Subscribe
@@ -65,16 +78,61 @@ public class ExamplePlugin extends Plugin {
     }
 
     @Subscribe
-    public void onGameObjectSpawned(GameObjectSpawned event) {
-        GameObject gameObject = event.getGameObject();
+    public void onDecorativeObjectSpawned(DecorativeObjectSpawned event) {
+        var object = event.getDecorativeObject();
 
-        if (gameObject.getId() == 55395 && helperObject == null) {
-            ObjectComposition objectDefinition = getObjectComposition(gameObject.getId());
-            helperObject = new HelperObject(gameObject.getId(), objectDefinition);
-            log("DEBUG", "Vessel helper set");
-        } else if (gameObject.getId() == 55395 && helperObject != null) {
-            log("DEBUG", "DUPE VESSEL SPAWN?");
+        if (object.getId() == MixologyIDs.AGA_LEVER) {
+            overlay3D.agaLever = object;
         }
+    }
+
+    @Subscribe
+    public void onGameObjectSpawned(GameObjectSpawned event) {
+        var object = event.getGameObject();
+
+        switch (object.getId()) {
+            case MixologyIDs.CONVEYOR_BELT:
+                if (overlay3D.conveyorBeltOne == null) {
+                    overlay3D.conveyorBeltOne = object;
+                } else if (overlay3D.conveyorBeltTwo == null) {
+                    overlay3D.conveyorBeltTwo = object;
+                }
+                break;
+            case MixologyIDs.LYE_LEVER:
+                overlay3D.lyeLever = object;
+                break;
+            case MixologyIDs.MOX_LEVER:
+                overlay3D.moxLever = object;
+                break;
+            case MixologyIDs.ALEMBIC:
+                overlay3D.alembic = object;
+                break;
+            case MixologyIDs.AGITATOR:
+                overlay3D.agitator = object;
+                break;
+            case MixologyIDs.RETORT:
+                overlay3D.retort = object;
+                break;
+            case MixologyIDs.VESSEL:
+                overlay3D.vessel = object;
+                break;
+        }
+
+//        if (gameObject.getId() == 54917) {
+//            if (overlay3D.conveyorBeltOne == null) {
+//                overlay3D.conveyorBeltOne = gameObject;
+//            } else if (overlay3D.conveyorBeltTwo == null) {
+//                overlay3D.conveyorBeltTwo = gameObject;
+//            }
+//        }
+//
+//        if (gameObject.getId() == 55395 && helperObject == null) {
+//            ObjectComposition objectDefinition = getObjectComposition(gameObject.getId());
+//            helperObject = new HelperObject(gameObject.getId(), objectDefinition);
+//            log("DEBUG", "Vessel helper set");
+//        } else if (gameObject.getId() == 55395 && helperObject != null) {
+//            log("DEBUG", "DUPE VESSEL SPAWN?");
+//        }
 
 //		log("Game object spawned", Integer.valueOf(gameObject.getId()).toString());
 //		log("Game object spawned at", event.getTile().toString());
@@ -86,20 +144,12 @@ public class ExamplePlugin extends Plugin {
 
     @Subscribe
     public void onGameObjectDespawned(GameObjectDespawned event) {
-        if (event.getGameObject().getId() == 55395 && helperObject != null) {
-            helperObject = null;
-            log("DEBUG", "Vessel helper unset");
-        }
+        // TODO: Add cleanup code
     }
 
     @Subscribe
     public void onGameTick(GameTick event) {
-        if (helperObject != null) {
-            helperObject.composition = getObjectComposition(helperObject.objectId);
-//            log("DEBUG", helperObject.composition.getName());
-        }
-
-        machine.onTickStart(client);
+        machine.onTickStart();
 
         if (lastState != machine.getState()) {
             lastState = machine.getState();
@@ -107,6 +157,10 @@ public class ExamplePlugin extends Plugin {
             if (machine.getState() != MixologyState.WAITING_TO_START) {
                 log("MIXOLOGY", machine.getNextStep());
             }
+        }
+
+        if (machine.getState() == MixologyState.MIXING) {
+            log.info(machine.getComponentsToAdd().stream().map(Enum::name).collect(Collectors.joining(",")));
         }
     }
 
@@ -127,10 +181,9 @@ public class ExamplePlugin extends Plugin {
     }
 
     @Subscribe
-    public void onVarbitChanged(VarbitChanged event)
-    {
+    public void onVarbitChanged(VarbitChanged event) {
         if (MixologyVarbits.isRelevantVarbit(event.getVarbitId())) {
-            machine.onVarbitsUpdated(client);
+            machine.onVarbitsUpdated();
 
             if (lastState != machine.getState()) {
                 lastState = machine.getState();
@@ -146,7 +199,7 @@ public class ExamplePlugin extends Plugin {
     }
 
 
-//    @Subscribe
+    //    @Subscribe
 //    public void onVarbitChanged(VarbitChanged event)
 //    {
 //        if (event.getVarpId() == REPUTATION_VARBIT)
@@ -174,19 +227,16 @@ public class ExamplePlugin extends Plugin {
 //    }
 //
     @Nullable
-    private ObjectComposition getObjectComposition(int id)
-    {
+    private ObjectComposition getObjectComposition(int id) {
         ObjectComposition objectComposition = client.getObjectDefinition(id);
         return objectComposition.getImpostorIds() == null ? objectComposition : objectComposition.getImpostor();
     }
 
-    private TileObject findTileObject(int z, int x, int y, int id)
-    {
+    private TileObject findTileObject(int z, int x, int y, int id) {
         Scene scene = client.getScene();
         Tile[][][] tiles = scene.getTiles();
         final Tile tile = tiles[z][x][y];
-        if (tile == null)
-        {
+        if (tile == null) {
             return null;
         }
 
@@ -195,34 +245,29 @@ public class ExamplePlugin extends Plugin {
         final WallObject tileWallObject = tile.getWallObject();
         final GroundObject groundObject = tile.getGroundObject();
 
-        if (objectIdEquals(tileWallObject, id))
-        {
+        if (objectIdEquals(tileWallObject, id)) {
             if (id == 54867) {
                 log("MATEDEBUG", "AGA lever is a tile wall object");
             }
             return tileWallObject;
         }
 
-        if (objectIdEquals(tileDecorativeObject, id))
-        {
+        if (objectIdEquals(tileDecorativeObject, id)) {
             if (id == 54867) {
                 log("MATEDEBUG", "AGA lever is a decorative object");
             }
             return tileDecorativeObject;
         }
 
-        if (objectIdEquals(groundObject, id))
-        {
+        if (objectIdEquals(groundObject, id)) {
             if (id == 54867) {
                 log("MATEDEBUG", "AGA lever is a ground object");
             }
             return groundObject;
         }
 
-        for (GameObject object : tileGameObjects)
-        {
-            if (objectIdEquals(object, id))
-            {
+        for (GameObject object : tileGameObjects) {
+            if (objectIdEquals(object, id)) {
                 if (id == 54867) {
                     log("MATEDEBUG", "AGA lever is a game object");
                 }
@@ -233,15 +278,12 @@ public class ExamplePlugin extends Plugin {
         return null;
     }
 
-    private boolean objectIdEquals(TileObject tileObject, int id)
-    {
-        if (tileObject == null)
-        {
+    private boolean objectIdEquals(TileObject tileObject, int id) {
+        if (tileObject == null) {
             return false;
         }
 
-        if (tileObject.getId() == id)
-        {
+        if (tileObject.getId() == id) {
             return true;
         }
 
@@ -249,12 +291,9 @@ public class ExamplePlugin extends Plugin {
         // all of the GAME_OBJECT_OPTION actions, so check the id against the impostor ids
         final ObjectComposition comp = client.getObjectDefinition(tileObject.getId());
 
-        if (comp.getImpostorIds() != null)
-        {
-            for (int impostorId : comp.getImpostorIds())
-            {
-                if (impostorId == id)
-                {
+        if (comp.getImpostorIds() != null) {
+            for (int impostorId : comp.getImpostorIds()) {
+                if (impostorId == id) {
                     return true;
                 }
             }
@@ -269,16 +308,13 @@ public class ExamplePlugin extends Plugin {
     }
 
     @Subscribe
-    public void onMenuEntryAdded(MenuEntryAdded event)
-    {
-        if (event.getType() != MenuAction.EXAMINE_OBJECT.getId() || !client.isKeyPressed(KeyCode.KC_SHIFT))
-        {
+    public void onMenuEntryAdded(MenuEntryAdded event) {
+        if (event.getType() != MenuAction.EXAMINE_OBJECT.getId() || !client.isKeyPressed(KeyCode.KC_SHIFT)) {
             return;
         }
 
         final TileObject tileObject = findTileObject(client.getPlane(), event.getActionParam0(), event.getActionParam1(), event.getIdentifier());
-        if (tileObject == null)
-        {
+        if (tileObject == null) {
             return;
         }
 
@@ -293,11 +329,9 @@ public class ExamplePlugin extends Plugin {
                 .onClick(this::logObjectInfo);
     }
 
-    private void logObjectInfo(MenuEntry entry)
-    {
+    private void logObjectInfo(MenuEntry entry) {
         TileObject object = findTileObject(client.getPlane(), entry.getParam0(), entry.getParam1(), entry.getIdentifier());
-        if (object == null)
-        {
+        if (object == null) {
             return;
         }
 
@@ -307,8 +341,7 @@ public class ExamplePlugin extends Plugin {
         String name = objectDefinition.getName();
         // Name is probably never "null" - however prevent adding it if it is, as it will
         // become ambiguous as objects with no name are assigned name "null"
-        if (Strings.isNullOrEmpty(name) || name.equals("null"))
-        {
+        if (Strings.isNullOrEmpty(name) || name.equals("null")) {
             return;
         }
 
@@ -369,7 +402,7 @@ public class ExamplePlugin extends Plugin {
 
 
     @Provides
-    ExampleConfig provideConfig(ConfigManager configManager) {
-        return configManager.getConfig(ExampleConfig.class);
+    EasyMixologyConfig provideConfig(ConfigManager configManager) {
+        return configManager.getConfig(EasyMixologyConfig.class);
     }
 }
