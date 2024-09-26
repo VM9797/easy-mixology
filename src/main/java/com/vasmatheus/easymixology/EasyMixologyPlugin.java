@@ -44,10 +44,16 @@ public class EasyMixologyPlugin extends Plugin {
     private EasyMixologyOverlay2D overlay2D;
 
     @Inject
+    private UiHelper uiHelper;
+
+    @Inject
     private OverlayManager overlayManager;
 
     @Inject
     private ClientThread clientThread;
+
+    @Inject
+    private DebugUtil debugUtil;
 
     private int areaBootstrapTickCounter = ARE_BOOTSTRAP_TICK_COUNTER_START;
     private boolean inArea = false;
@@ -62,6 +68,11 @@ public class EasyMixologyPlugin extends Plugin {
     protected void shutDown() throws Exception {
         overlayManager.remove(overlay3D);
         overlayManager.remove(overlay2D);
+    }
+
+    @Subscribe
+    public void onMenuEntryAdded(MenuEntryAdded event) {
+        debugUtil.onMenuEntryAdded(event);
     }
 
     @Subscribe
@@ -111,6 +122,18 @@ public class EasyMixologyPlugin extends Plugin {
             case MixologyIDs.HOPPER:
                 overlay3D.hopper = object;
                 break;
+            case MixologyIDs.DIGWEED_NE:
+                uiHelper.digweedNE = object;
+                break;
+            case MixologyIDs.DIGWEED_SE:
+                uiHelper.digweedSE = object;
+                break;
+            case MixologyIDs.DIGWEED_SW:
+                uiHelper.digweedSW = object;
+                break;
+            case MixologyIDs.DIGWEED_NW:
+                uiHelper.digweedNW = object;
+                break;
         }
     }
 
@@ -143,12 +166,25 @@ public class EasyMixologyPlugin extends Plugin {
             case MixologyIDs.HOPPER:
                 overlay3D.hopper = null;
                 break;
+            case MixologyIDs.DIGWEED_NE:
+                uiHelper.digweedNE = null;
+                break;
+            case MixologyIDs.DIGWEED_SE:
+                uiHelper.digweedSE = null;
+                break;
+            case MixologyIDs.DIGWEED_SW:
+                uiHelper.digweedSW = null;
+                break;
+            case MixologyIDs.DIGWEED_NW:
+                uiHelper.digweedNW = null;
+                break;
         }
     }
 
     @Subscribe
     public void onGameTick(GameTick event) {
         Widget mixologyWidget = client.getWidget(MixologyIDs.MIXOLOGY_WIDGET_ID);
+        state.onTickUpdate();
 
         if (mixologyWidget != null) {
             inArea = true;
@@ -172,7 +208,7 @@ public class EasyMixologyPlugin extends Plugin {
     @Subscribe
     public void onVarbitChanged(VarbitChanged event) {
         if (MixologyVarbits.isRelevantVarbit(event.getVarbitId())) {
-            state.update();
+            state.onVarbitUpdate();
             stats.updateVarbits();
         }
     }
@@ -186,7 +222,7 @@ public class EasyMixologyPlugin extends Plugin {
     public void onConfigChanged(ConfigChanged configChanged)
     {
         if (configChanged.getGroup().equals(EasyMixologyConfig.GROUP)) {
-            clientThread.invoke(() -> state.update());
+            clientThread.invoke(() -> state.onVarbitUpdate());
         }
     }
 

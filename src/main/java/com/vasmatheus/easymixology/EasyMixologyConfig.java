@@ -106,6 +106,18 @@ public interface EasyMixologyConfig extends Config {
 
     @ConfigItem(
             position = 6,
+            keyName = "isStationSpeedupInfoboxHighlightEnabled",
+            name = "Refinery speedup infobox highlight",
+            description = "Toggles to highlight the infobox or not when refinery speedup is possible",
+            section = optionsSection
+    )
+    default boolean isStationSpeedupInfoboxHighlightEnabled()
+    {
+        return true;
+    }
+
+    @ConfigItem(
+            position = 7,
             keyName = "isConveyorBeltHighlightEnabled",
             name = "Conveyor belt highlight",
             description = "Toggles to highlight the conveyor belts or not",
@@ -117,13 +129,49 @@ public interface EasyMixologyConfig extends Config {
     }
 
     @ConfigItem(
-            position = 7,
+            position = 8,
             keyName = "isEmptyHopperHighlightEnabled",
             name = "Low hopper highlight",
             description = "Toggles to highlight the low level hopper or not",
             section = optionsSection
     )
     default boolean isEmptyHopperHighlightEnabled()
+    {
+        return true;
+    }
+
+    @ConfigItem(
+            position = 9,
+            keyName = "isLeverPullCountTextEnabled",
+            name = "Lever pull text",
+            description = "Toggles to display the amount of pulls required on a lever or not",
+            section = optionsSection
+    )
+    default boolean isLeverPullCountTextEnabled()
+    {
+        return true;
+    }
+
+    @ConfigItem(
+            position = 10,
+            keyName = "isDigweedHighlightEnabled",
+            name = "Digweed highlight",
+            description = "Toggles to highlight the mature digweed herb",
+            section = optionsSection
+    )
+    default boolean isDigweedHighlightEnabled()
+    {
+        return true;
+    }
+
+    @ConfigItem(
+            position = 11,
+            keyName = "isDigweedInfoboxHighlightEnabled",
+            name = "Digweed infobox highlight",
+            description = "Toggles to highlight the infobox when mature digweed herb spawns",
+            section = optionsSection
+    )
+    default boolean isDigweedInfoboxHighlightEnabled()
     {
         return true;
     }
@@ -227,7 +275,7 @@ public interface EasyMixologyConfig extends Config {
 
     @Alpha
     @ConfigItem(
-            position = 5,
+            position = 8,
             keyName = "refinerySpeedupOutline",
             name = "Refinery speedup outline",
             description = "Color to use to outline the agitator or alembic station when speedup action is possible",
@@ -235,6 +283,42 @@ public interface EasyMixologyConfig extends Config {
     )
     default Color refinerySpeedupOutline() {
         return Color.CYAN;
+    }
+
+    @Alpha
+    @ConfigItem(
+            position = 9,
+            keyName = "refinerySpeedupInfoboxHighlight",
+            name = "Refinery speedup infobox highlight",
+            description = "Color to use to highlight the infobox when speedup action is possible",
+            section = highlightColorSection
+    )
+    default Color refinerySpeedupInfoboxHighlight() {
+        return new Color(20, 131, 137, 108);
+    }
+
+    @Alpha
+    @ConfigItem(
+            position = 10,
+            keyName = "digweedOutline",
+            name = "Digweed outline",
+            description = "Color to use to outline the the mature digweed",
+            section = highlightColorSection
+    )
+    default Color digweedOutline() {
+        return new Color(50, 205, 50);
+    }
+
+    @Alpha
+    @ConfigItem(
+            position = 11,
+            keyName = "digweedInfoboxHighlight",
+            name = "Digweed infobox highlight",
+            description = "Color to use to highlight the infobox when mature digweed spawns",
+            section = highlightColorSection
+    )
+    default Color digweedInfoboxHighlight() {
+        return new Color(32, 125, 32, 108);
     }
 
     @ConfigItem(

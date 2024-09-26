@@ -2,9 +2,11 @@ package com.vasmatheus.easymixology;
 
 import com.vasmatheus.easymixology.model.MixologyStateMachine;
 import com.vasmatheus.easymixology.model.MixologyStats;
+import com.vasmatheus.easymixology.model.enums.MixologyState;
 import com.vasmatheus.easymixology.model.enums.PotionComponent;
 import net.runelite.client.ui.overlay.OverlayPanel;
 import net.runelite.client.ui.overlay.OverlayPosition;
+import net.runelite.client.ui.overlay.components.ComponentConstants;
 import net.runelite.client.ui.overlay.components.LineComponent;
 import net.runelite.client.ui.overlay.components.TitleComponent;
 
@@ -26,6 +28,9 @@ public class EasyMixologyOverlay2D extends OverlayPanel {
     @Inject
     private EasyMixologyConfig config;
 
+    @Inject
+    private UiHelper uiHelper;
+
     public EasyMixologyOverlay2D() {
         super();
         setPosition(OverlayPosition.TOP_CENTER);
@@ -37,6 +42,8 @@ public class EasyMixologyOverlay2D extends OverlayPanel {
         if (!state.isStarted() || !config.isOverlayEnabled()) {
             return super.render(graphics);
         }
+
+        panelComponent.setBackgroundColor(ComponentConstants.STANDARD_BACKGROUND_COLOR);
 
         var targetPotion = state.getTargetPotion();
 
@@ -74,9 +81,17 @@ public class EasyMixologyOverlay2D extends OverlayPanel {
                 .build());
 
         panelComponent.getChildren().add(LineComponent.builder()
-                .left("Component")
+                .left("Components")
                 .right(colorCodePotionComponent(targetPotion.firstComponent) + " / " + colorCodePotionComponent(targetPotion.secondComponent) + " / " + colorCodePotionComponent(targetPotion.thirdComponent))
                 .build());
+
+        if (config.isStationSpeedupInfoboxHighlightEnabled() && state.getState() == MixologyState.REFINING && (uiHelper.isAgitatorSpeedupObjectPresent()) || uiHelper.isAlembicSpeedupObjectPresent()) {
+            panelComponent.setBackgroundColor(config.refinerySpeedupInfoboxHighlight());
+        }
+
+        if (config.isDigweedInfoboxHighlightEnabled() && uiHelper.isMatureDigweedPresent()) {
+            panelComponent.setBackgroundColor(config.digweedInfoboxHighlight());
+        }
 
         return super.render(graphics);
     }

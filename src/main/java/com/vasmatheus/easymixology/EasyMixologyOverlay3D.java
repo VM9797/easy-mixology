@@ -1,12 +1,14 @@
 package com.vasmatheus.easymixology;
 
-import com.vasmatheus.easymixology.constants.MixologyIDs;
 import com.vasmatheus.easymixology.model.MixologyStateMachine;
 import com.vasmatheus.easymixology.model.MixologyStats;
 import com.vasmatheus.easymixology.model.enums.PotionComponent;
 import com.vasmatheus.easymixology.model.enums.RefinementType;
+import net.runelite.api.Point;
 import net.runelite.api.*;
+import net.runelite.api.coords.LocalPoint;
 import net.runelite.client.ui.overlay.Overlay;
+import net.runelite.client.ui.overlay.OverlayUtil;
 import net.runelite.client.ui.overlay.outline.ModelOutlineRenderer;
 
 import javax.inject.Inject;
@@ -28,6 +30,9 @@ public class EasyMixologyOverlay3D extends Overlay {
     private EasyMixologyConfig config;
 
     @Inject
+    private UiHelper uiHelper;
+
+    @Inject
     private Client client;
 
     Set<GameObject> conveyorBelts = new HashSet<>();
@@ -45,28 +50,43 @@ public class EasyMixologyOverlay3D extends Overlay {
 
     @Override
     public Dimension render(Graphics2D graphics) {
+        if (!state.isStarted()) {
+            return null;
+        }
+
         switch (state.getState()) {
             case MIXING:
-                drawLever();
-                drawHopperIfNeeded();
+                outlineLevers(graphics);
+                outlineHopper();
                 break;
             case MIX_READY:
-                drawVessel();
-                drawRefinery(true);
-                drawHopperIfNeeded();
+                outlineVessel();
+                outlineRefinery(true);
+                outlineHopper();
                 break;
             case READY_TO_REFINE:
             case REFINING:
-                drawRefinery(false);
+                outlineRefinery(false);
                 break;
             case READY_TO_DEPOSIT:
                 drawConveyorBelt();
                 break;
         }
+
+        outlineDigweed();
+
         return null;
     }
 
-    private void drawRefinery(boolean preDraw) {
+    private void outlineDigweed() {
+        if (!config.isDigweedHighlightEnabled() || !uiHelper.isMatureDigweedPresent()) {
+            return;
+        }
+
+        outlineObject(uiHelper.getMatureDigweedObjectOrNull(), config.digweedOutline());
+    }
+
+    private void outlineRefinery(boolean preDraw) {
         if (agitator == null || alembic == null || retort == null) {
             return;
         }
@@ -74,11 +94,11 @@ public class EasyMixologyOverlay3D extends Overlay {
         var targetRefinery = state.getTargetRefinementType() == RefinementType.AGITATOR ? agitator :
                 state.getTargetRefinementType() == RefinementType.ALEMBIC ? alembic : retort;
 
-        if (isGraphicsObjectPresent(MixologyIDs.ALEMBIC_SPEEDUP_OBJECT_ID) && targetRefinery == alembic && config.isStationSpeedupHighlightEnabled()) {
+        if (targetRefinery == alembic && config.isStationSpeedupHighlightEnabled() && uiHelper.isAlembicSpeedupObjectPresent()) {
             outlineObject(targetRefinery, config.refinerySpeedupOutline());
             return;
         }
-        else if (isGraphicsObjectPresent(MixologyIDs.AGITATOR_SPEEDUP_OBJECT_ID) && targetRefinery == agitator && config.isStationSpeedupHighlightEnabled()) {
+        else if (targetRefinery == agitator && config.isStationSpeedupHighlightEnabled() && uiHelper.isAgitatorSpeedupObjectPresent()) {
             outlineObject(targetRefinery, config.refinerySpeedupOutline());
             return;
         }
@@ -90,7 +110,7 @@ public class EasyMixologyOverlay3D extends Overlay {
         outlineObject(targetRefinery, preDraw ? config.refineryPreOutline() : config.refineryOutline());
     }
 
-    private void drawVessel() {
+    private void outlineVessel() {
         if (vessel == null || !config.isVesselHighlightEnabled()) {
             return;
         }
@@ -98,22 +118,44 @@ public class EasyMixologyOverlay3D extends Overlay {
         outlineObject(vessel, config.vesselOutline());
     }
 
-    private void drawLever() {
+    private void outlineLevers(Graphics2D graphics) {
+        var pullCountMap = state.getLeversToPullMap();
+        var componentsToAdd = pullCountMap.keySet();
+
+        for (var component : componentsToAdd) {
+            if (component == PotionComponent.LYE && lyeLever != null && pullCountMap.get(component) != 0) {
+                outlineTargetLever(lyeLever, config.lyeLeverOutline());
+                drawLeverPullCount(lyeLever, pullCountMap.get(component), config.lyeLeverOutline(), graphics);
+            } else if (component == PotionComponent.AGA && agaLever != null && pullCountMap.get(component) != 0) {
+                outlineTargetLever(agaLever, config.agaLeverOutline());
+                drawLeverPullCount(agaLever, pullCountMap.get(component), config.agaLeverOutline(), graphics);
+            } else if (component == PotionComponent.MOX && moxLever != null && pullCountMap.get(component) != 0) {
+                outlineTargetLever(moxLever, config.moxLeverOutline());
+                drawLeverPullCount(moxLever, pullCountMap.get(component), config.moxLeverOutline(), graphics);
+            }
+        }
+    }
+
+    private void outlineTargetLever(TileObject lever, Color color) {
         if (!config.isLeverHighlightEnabled()) {
             return;
         }
 
-        var componentsToAdd = state.getComponentsToAdd();
+        outlineObject(lever, color);
+    }
 
-        for (var component : componentsToAdd) {
-            if (component == PotionComponent.LYE && lyeLever != null) {
-                outlineObject(lyeLever, config.lyeLeverOutline());
-            } else if (component == PotionComponent.AGA && agaLever != null) {
-                outlineObject(agaLever, config.agaLeverOutline());
-            } else if (component == PotionComponent.MOX && moxLever != null) {
-                outlineObject(moxLever, config.moxLeverOutline());
-            }
+    private void drawLeverPullCount(TileObject targetLever, Integer pullCount, Color color, Graphics2D graphics)
+    {
+        if (!config.isLeverPullCountTextEnabled() || pullCount == null)
+        {
+            return;
         }
+
+        String text = String.format("%dx", pullCount);
+        LocalPoint crucibleLoc = targetLever.getLocalLocation();
+        crucibleLoc = new LocalPoint(crucibleLoc.getX(), crucibleLoc.getY());
+        Point pos = Perspective.getCanvasTextLocation(client, graphics, crucibleLoc, text, 250);
+        OverlayUtil.renderTextLocation(graphics, pos, text, color);
     }
 
     private void drawConveyorBelt() {
@@ -126,7 +168,7 @@ public class EasyMixologyOverlay3D extends Overlay {
         }
     }
 
-    private void drawHopperIfNeeded() {
+    private void outlineHopper() {
         if (hopper == null || !isHopperOutlineNeeded()) {
             return;
         }
@@ -143,12 +185,4 @@ public class EasyMixologyOverlay3D extends Overlay {
         return potion.moxValue > stats.getHopperMoxCount() || potion.agaValue > stats.getHopperAgaCount() || potion.lyeValue > stats.getHopperLyeCount();
     }
 
-    private boolean isGraphicsObjectPresent(int graphicsObjectId) {
-        for (GraphicsObject graphicsObject : client.getGraphicsObjects()) {
-            if (graphicsObject.getId() == graphicsObjectId) {
-                return true;
-            }
-        }
-        return false;
-    }
 }

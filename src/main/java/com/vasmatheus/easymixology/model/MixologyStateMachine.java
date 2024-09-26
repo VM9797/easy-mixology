@@ -12,8 +12,8 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.HashMap;
+import java.util.Map;
 
 @Singleton
 public class MixologyStateMachine {
@@ -33,6 +33,9 @@ public class MixologyStateMachine {
 
     @Getter
     private boolean isStarted = false;
+
+    @Getter
+    private final Map<PotionComponent, Integer> leversToPullMap = new HashMap<>();
 
     public Potion getTargetPotion() {
         return order.mostValuablePotion;
@@ -58,7 +61,17 @@ public class MixologyStateMachine {
         processMixingState(variablesSnapshot);
     }
 
-    public void update() {
+    public void onTickUpdate() {
+        if (!isStarted) {
+            return;
+        }
+
+        if (state == MixologyState.MIXING) {
+            updateLeversToPull();
+        }
+    }
+
+    public void onVarbitUpdate() {
         var orderFromVarbits = MixologyOrder.fromVarbits(client, config.potionSelectionStrategy());
         var variablesFromVarbits = MixologyVariablesSnapshot.fromVarbits(client);
 
@@ -67,7 +80,6 @@ public class MixologyStateMachine {
             order = orderFromVarbits;
             state = MixologyState.MIXING;
             variablesSnapshot = variablesFromVarbits;
-            return;
         }
 
 
@@ -90,19 +102,27 @@ public class MixologyStateMachine {
 
     }
 
-    // TODO: It's unnecessary to do this on every render cycle
-    public Set<PotionComponent> getComponentsToAdd() {
+    private void updateLeversToPull() {
         var targetPotion = getTargetPotion();
-        var componentsToAdd = new ArrayList<>(Arrays.asList(targetPotion.firstComponent, targetPotion.secondComponent,
+
+        var leversToPull = new ArrayList<>(Arrays.asList(targetPotion.firstComponent, targetPotion.secondComponent,
                 targetPotion.thirdComponent));
 
-        componentsToAdd.remove(variablesSnapshot.componentInFirstMixer);
-        componentsToAdd.remove(variablesSnapshot.componentInSecondMixer);
+        for (var component : PotionComponent.values()) {
+            leversToPullMap.put(component, 0);
+        }
 
-        return new HashSet<>(componentsToAdd);
+        if (leversToPull.remove(variablesSnapshot.componentInFirstMixer)) {
+            leversToPull.remove(variablesSnapshot.componentInSecondMixer);
+        }
+
+        for (var component : leversToPull) {
+            leversToPullMap.put(component, leversToPullMap.get(component) + 1);
+        }
     }
 
     private void processMixingState(MixologyVariablesSnapshot nextSnapshot) {
+        updateLeversToPull();
         if (nextSnapshot.potionInVessel == order.mostValuablePotion) {
             state = MixologyState.MIX_READY;
         }
