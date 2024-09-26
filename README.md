@@ -15,7 +15,7 @@ Note: Currently the plugin assumes the player starts with a mix from scratch whe
 ![overlay](https://github.com/user-attachments/assets/eeed19f4-9c01-4a76-8db1-74983375cc04)
 
 #### High customizability
-![options](https://github.com/user-attachments/assets/28d9eb59-2f52-4771-bf75-721a96b4b6e1)
+![options](https://github.com/user-attachments/assets/8ae41beb-ae6a-4e1f-81e9-a6eba75386f0)
 
 #### Potion strategy
 - Select best potion based on your preference
@@ -28,10 +28,17 @@ Note: Currently the plugin assumes the player starts with a mix from scratch whe
 #### Alembic and Agitator highlight when speed up is possible
 ![image](https://github.com/user-attachments/assets/2580dd83-523b-4dc6-a84e-8f1031da0d5d)
 
+Also for the info box!
+![image](https://github.com/user-attachments/assets/032f3f46-ae89-4c04-b5ce-dd8bde14b767)
+
+
 #### Low hopper content highlight
 ![image](https://github.com/user-attachments/assets/758f34d7-b1ec-48d2-b6be-4220aa0a356e)
 
 #### Digweed highlight
+Infobox and the herb!
+![image](https://github.com/user-attachments/assets/8791a495-3ee9-4ba7-b666-893411405eb7)
+
 
 ## In progress
 - Considering potions inventory
