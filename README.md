@@ -31,12 +31,10 @@ Note: Currently the plugin assumes the player starts with a mix from scratch whe
 #### Low hopper content highlight
 ![image](https://github.com/user-attachments/assets/758f34d7-b1ec-48d2-b6be-4220aa0a356e)
 
+#### Digweed highlight
 
 ## In progress
-
-- Text indicators for object highlights for instructions
 - Considering potions inventory
-- Digweed highlight
 
 ## Changelog
 #### 1.0.0 - Initial release
@@ -55,3 +53,8 @@ Note: Currently the plugin assumes the player starts with a mix from scratch whe
 - Added hopper level tracking and low level highlighting
 - Added more customizability options
 - Added player reward points tracking
+
+#### 1.3.0
+
+- Added text overlay for levers to indicate pull count
+- Added digweed highlight
