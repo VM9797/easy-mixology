@@ -52,9 +52,6 @@ public class EasyMixologyPlugin extends Plugin {
     @Inject
     private ClientThread clientThread;
 
-    @Inject
-    private DebugUtil debugUtil;
-
     private int areaBootstrapTickCounter = ARE_BOOTSTRAP_TICK_COUNTER_START;
     private boolean inArea = false;
 
@@ -68,11 +65,6 @@ public class EasyMixologyPlugin extends Plugin {
     protected void shutDown() throws Exception {
         overlayManager.remove(overlay3D);
         overlayManager.remove(overlay2D);
-    }
-
-    @Subscribe
-    public void onMenuEntryAdded(MenuEntryAdded event) {
-        debugUtil.onMenuEntryAdded(event);
     }
 
     @Subscribe
