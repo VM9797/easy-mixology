@@ -61,21 +61,6 @@ public class MixologyOrder {
                         mostValuablePotionRefinement != RefinementType.NONE;
     }
 
-    @Override
-    public String toString() {
-        return "Order{" +
-                "firstPotion=" + firstPotion +
-                ", secondPotion=" + secondPotion +
-                ", thirdPotion=" + thirdPotion +
-                ", firstPotionRefinement=" + firstPotionRefinement +
-                ", secondPotionRefinement=" + secondPotionRefinement +
-                ", thirdPotionRefinement=" + thirdPotionRefinement +
-                ", mostValuablePotion=" + mostValuablePotion +
-                ", mostValuablePotionRefinement=" + mostValuablePotionRefinement +
-                ", isValidOrder=" + isValidOrder +
-                '}';
-    }
-
     public static MixologyOrder fromVarbits(Client client) {
         return new MixologyOrder(Potion.fromVarbitValue(client.getVarbitValue(MixologyVarbits.ORDER_FIRST_POTION)),
                 Potion.fromVarbitValue(client.getVarbitValue(MixologyVarbits.ORDER_SECOND_POTION)),

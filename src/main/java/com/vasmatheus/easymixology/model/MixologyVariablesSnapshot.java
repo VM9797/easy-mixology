@@ -37,19 +37,6 @@ public class MixologyVariablesSnapshot {
         this.componentInThirdMixer = componentInThirdMixer;
     }
 
-    @Override
-    public String toString() {
-        return "MixologyVariablesSnapshot{" +
-                "potionInVessel=" + potionInVessel +
-                ", agitatorLevel=" + agitatorLevel +
-                ", retortLevel=" + retortLevel +
-                ", alembicLevel=" + alembicLevel +
-                ", componentInFirstMixer=" + componentInFirstMixer +
-                ", componentInSecondMixer=" + componentInSecondMixer +
-                ", componentInThirdMixer=" + componentInThirdMixer +
-                '}';
-    }
-
     public static MixologyVariablesSnapshot fromVarbits(Client client) {
         return new MixologyVariablesSnapshot(
                 Potion.fromVarbitValue(client.getVarbitValue(MixologyVarbits.VESSEL)),

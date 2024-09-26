@@ -30,15 +30,6 @@ public class MixologyStateMachine {
     @Getter
     private boolean isStarted = false;
 
-    @Override
-    public String toString() {
-        return "MixologyStateMachine{" +
-                "order=" + order +
-                ", state=" + state +
-                ", variablesSnapshot=" + variablesSnapshot +
-                '}';
-    }
-
     public Potion getTargetPotion() {
         return order.mostValuablePotion;
     }
@@ -71,7 +62,6 @@ public class MixologyStateMachine {
             state = MixologyState.MIXING;
             variablesSnapshot = variablesFromVarbits;
             return;
-//            client.addChatMessage(ChatMessageType.GAMEMESSAGE, "", "RESET HAPPENED", null);
         }
 
 
@@ -106,39 +96,7 @@ public class MixologyStateMachine {
         return new HashSet<>(componentsToAdd);
     }
 
-    public String getNextStep() {
-        StringBuilder sb = new StringBuilder();
-        sb.append(state.name());
-        sb.append(": ");
-        switch (state) {
-            case MIXING:
-                sb.append(order.mostValuablePotion.name());
-                sb.append(" - ");
-                sb.append(order.mostValuablePotion.firstComponent.name());
-                sb.append(order.mostValuablePotion.secondComponent.name());
-                sb.append(order.mostValuablePotion.thirdComponent.name());
-                break;
-            case MIX_READY:
-                sb.append("TAKE POTION FROM VESSEL");
-                break;
-            case READY_TO_REFINE:
-                sb.append("REFINE AT ");
-                sb.append(order.mostValuablePotionRefinement.name());
-                break;
-            case REFINING:
-                sb.append("KEEP REFINING");
-                break;
-            case READY_TO_DEPOSIT:
-                sb.append("DEPOSIT");
-        }
-
-        return sb.toString();
-    }
-
     private void processMixingState(Client client, MixologyVariablesSnapshot nextSnapshot) {
-//        client.addChatMessage(ChatMessageType.GAMEMESSAGE, "", "MIXING STATE PROCESS", null);
-//        client.addChatMessage(ChatMessageType.GAMEMESSAGE, "", "NEXT: " + nextSnapshot.potionInVessel.name(), null);
-//        client.addChatMessage(ChatMessageType.GAMEMESSAGE, "", "ORDER: " + order.mostValuablePotion.name(), null);
         if (nextSnapshot.potionInVessel == order.mostValuablePotion) {
             state = MixologyState.MIX_READY;
         }
