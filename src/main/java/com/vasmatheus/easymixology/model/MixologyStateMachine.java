@@ -9,20 +9,26 @@ import net.runelite.api.Client;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 @Singleton
 public class MixologyStateMachine {
     @Inject
     Client client;
 
-    private MixologyOrder order = new MixologyOrder(Potion.NONE, Potion.NONE, Potion.NONE, RefinementType.NONE, RefinementType.NONE, RefinementType.NONE);
+    private MixologyOrder order = MixologyOrder.EMPTY;
 
     @Getter
     private MixologyState state = MixologyState.WAITING_TO_START;
 
     @Getter
     private MixologyVariablesSnapshot variablesSnapshot = MixologyVariablesSnapshot.EMPTY;
+
+    @Getter
+    private boolean isStarted = false;
 
     @Override
     public String toString() {
@@ -41,21 +47,39 @@ public class MixologyStateMachine {
         return order.mostValuablePotionRefinement;
     }
 
-    public void onTickStart() {
-        var orderFromVarbits = MixologyOrder.fromVarbits(client);
-        if (state == MixologyState.WAITING_TO_START && orderFromVarbits.doesEqual(order)) {
-            state = MixologyState.MIXING;
-        }
+    public void tickUpdate() {
+//        if (!isStarted) {
+//            return;
+//        }
+//        var orderFromVarbits = MixologyOrder.fromVarbits(client);
+//
+//        if (state == MixologyState.WAITING_TO_START && orderFromVarbits.doesEqual(order) && order.isValidOrder) {
+//            state = MixologyState.MIXING;
+//        }
+    }
+
+    public void stop() {
+        isStarted = false;
+        order = MixologyOrder.EMPTY;
+        state = MixologyState.WAITING_TO_START;
+        variablesSnapshot = MixologyVariablesSnapshot.EMPTY;
+    }
+
+    public void start() {
+        isStarted = true;
+        order = MixologyOrder.fromVarbits(client);
+        state = MixologyState.MIXING;
+        variablesSnapshot = MixologyVariablesSnapshot.fromVarbits(client);
     }
 
     public void onVarbitsUpdated() {
         var orderFromVarbits = MixologyOrder.fromVarbits(client);
         var variablesFromVarbits = MixologyVariablesSnapshot.fromVarbits(client);
 
-        if (!order.doesEqual(orderFromVarbits)) {
+        if (!order.doesEqual(orderFromVarbits) || !order.isValidOrder) {
             // RESET
             order = orderFromVarbits;
-            state = MixologyState.WAITING_TO_START;
+            state = MixologyState.MIXING;
             variablesSnapshot = variablesFromVarbits;
             return;
 //            client.addChatMessage(ChatMessageType.GAMEMESSAGE, "", "RESET HAPPENED", null);

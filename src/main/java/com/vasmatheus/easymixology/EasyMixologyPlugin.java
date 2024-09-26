@@ -2,24 +2,21 @@ package com.vasmatheus.easymixology;
 
 import com.google.common.base.Strings;
 import com.google.inject.Provides;
-
-import javax.annotation.Nullable;
-import javax.inject.Inject;
-
 import com.vasmatheus.easymixology.constants.MixologyIDs;
 import com.vasmatheus.easymixology.constants.MixologyVarbits;
 import com.vasmatheus.easymixology.model.MixologyStateMachine;
-import com.vasmatheus.easymixology.model.enums.MixologyState;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.*;
 import net.runelite.api.events.*;
+import net.runelite.api.widgets.Widget;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.ui.overlay.OverlayManager;
 
-import java.util.stream.Collectors;
+import javax.annotation.Nullable;
+import javax.inject.Inject;
 
 @Slf4j
 @PluginDescriptor(
@@ -28,6 +25,8 @@ import java.util.stream.Collectors;
         tags = {"mastering", "mixology", "minigame", "herblore", "alchemy", "lab", "herb", "paste", "mox", "lye", "aga", "potion"}
 )
 public class EasyMixologyPlugin extends Plugin {
+    private static final int ARE_BOOTSTRAP_TICK_COUNTER_START = 4;
+
     @Inject
     private Client client;
 
@@ -40,22 +39,16 @@ public class EasyMixologyPlugin extends Plugin {
     @Inject
     private OverlayManager overlayManager;
 
-    private MixologyState lastState = MixologyState.WAITING_TO_START;
+    private int areaBootstrapTickCounter = ARE_BOOTSTRAP_TICK_COUNTER_START;
+    private boolean inArea = false;
 
     @Override
     protected void startUp() throws Exception {
-        log.info("Example started!");
-
-        if (machine != null) {
-            lastState = machine.getState();
-        }
-
         overlayManager.add(overlay3D);
     }
 
     @Override
     protected void shutDown() throws Exception {
-        log.info("Example stopped!");
         overlayManager.remove(overlay3D);
 
     }
@@ -148,25 +141,31 @@ public class EasyMixologyPlugin extends Plugin {
     }
 
     @Subscribe
-    public void onGameTick(GameTick event) {
-        machine.onTickStart();
-
-        if (lastState != machine.getState()) {
-            lastState = machine.getState();
-
-            if (machine.getState() != MixologyState.WAITING_TO_START) {
-                log("MIXOLOGY", machine.getNextStep());
-            }
-        }
-
-        if (machine.getState() == MixologyState.MIXING) {
-            log.info(machine.getComponentsToAdd().stream().map(Enum::name).collect(Collectors.joining(",")));
-        }
+    public void onWidgetLoaded(WidgetLoaded event) {
     }
 
     @Subscribe
-    public void onWidgetLoaded(WidgetLoaded event) {
-//        log("DEBUG", event.toString());
+    public void onGameTick(GameTick event) {
+        Widget mixologyWidget = client.getWidget(MixologyIDs.MIXOLOGY_WIDGET_ID);
+        machine.tickUpdate();
+
+        if (mixologyWidget != null) {
+            inArea = true;
+
+            if (areaBootstrapTickCounter >= 0) {
+                areaBootstrapTickCounter--;
+
+                if (areaBootstrapTickCounter < 0) {
+                    machine.start();
+                }
+            }
+        } else {
+            if (inArea) {
+                inArea = false;
+                areaBootstrapTickCounter = ARE_BOOTSTRAP_TICK_COUNTER_START;
+                machine.stop();
+            }
+        }
     }
 
     @Subscribe
@@ -184,17 +183,6 @@ public class EasyMixologyPlugin extends Plugin {
     public void onVarbitChanged(VarbitChanged event) {
         if (MixologyVarbits.isRelevantVarbit(event.getVarbitId())) {
             machine.onVarbitsUpdated();
-
-            if (lastState != machine.getState()) {
-                lastState = machine.getState();
-
-                if (machine.getState() != MixologyState.WAITING_TO_START) {
-                    log("MIXOLOGY", machine.getNextStep());
-                }
-            }
-//            log("EASY MIXOLOGY", machine.getState().toString());
-        } else {
-//            log("DEBUG - IRRELEVANT VARBIT", "" + event.getVarbitId());
         }
     }
 

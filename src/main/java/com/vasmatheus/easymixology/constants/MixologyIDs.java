@@ -13,4 +13,7 @@ public class MixologyIDs {
     public static final int RETORT = 55389;
 
     public static final int VESSEL = 55395;
+
+    // Parent ID 57802753
+    public static final int MIXOLOGY_WIDGET_ID = 57802754;
 }
