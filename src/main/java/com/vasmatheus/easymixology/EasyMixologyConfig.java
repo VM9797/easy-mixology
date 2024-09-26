@@ -1,16 +1,25 @@
 package com.vasmatheus.easymixology;
 
+import com.vasmatheus.easymixology.model.enums.PotionSelectionStrategy;
 import net.runelite.client.config.*;
 
 import java.awt.*;
 
-@ConfigGroup("easymixology")
+@ConfigGroup(EasyMixologyConfig.GROUP)
 public interface EasyMixologyConfig extends Config {
+    String GROUP = "easymixology";
+
+    @ConfigSection(
+            name = "Options",
+            description = "Configuration for plugin behavior",
+            position = 0
+    )
+    String optionsSection = "optionsSection";
 
     @ConfigSection(
             name = "Highlight colors",
             description = "Colors for highlighting various mixology objects",
-            position = 0
+            position = 1
     )
     String highlightColorSection = "highlightColorSection";
 
@@ -18,9 +27,22 @@ public interface EasyMixologyConfig extends Config {
     @ConfigSection(
             name = "Highlight color style",
             description = "Styles for highlighting colors of mixology objects",
-            position = 1
+            position = 2
     )
     String highlightStyleSection = "highlightStyleSection";
+
+    @ConfigItem(
+            keyName = "potionSelectionStrategy",
+            name = "Potion strategy",
+            description = "Which strategy should the plugin use to select the target potion to make. For Prefer Retort, XP is used as a " +
+                    "fallback value to select the best retort option, or the next best option if no retort is available",
+            section = optionsSection
+    )
+    default PotionSelectionStrategy potionSelectionStrategy()
+    {
+        return PotionSelectionStrategy.HIGHEST_XP;
+    }
+
 
     @Alpha
     @ConfigItem(

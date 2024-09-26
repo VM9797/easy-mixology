@@ -8,8 +8,10 @@ import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
 import net.runelite.api.events.*;
 import net.runelite.api.widgets.Widget;
+import net.runelite.client.callback.ClientThread;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
+import net.runelite.client.events.ConfigChanged;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.ui.overlay.OverlayManager;
@@ -36,6 +38,9 @@ public class EasyMixologyPlugin extends Plugin {
 
     @Inject
     private OverlayManager overlayManager;
+
+    @Inject
+    private ClientThread clientThread;
 
     private int areaBootstrapTickCounter = ARE_BOOTSTRAP_TICK_COUNTER_START;
     private boolean inArea = false;
@@ -153,7 +158,15 @@ public class EasyMixologyPlugin extends Plugin {
     @Subscribe
     public void onVarbitChanged(VarbitChanged event) {
         if (MixologyVarbits.isRelevantVarbit(event.getVarbitId())) {
-            mixologyStateMachine.onVarbitsUpdated();
+            mixologyStateMachine.update();
+        }
+    }
+
+    @Subscribe
+    public void onConfigChanged(ConfigChanged configChanged)
+    {
+        if (configChanged.getGroup().equals(EasyMixologyConfig.GROUP)) {
+            clientThread.invoke(() -> mixologyStateMachine.update());
         }
     }
 
@@ -162,3 +175,4 @@ public class EasyMixologyPlugin extends Plugin {
         return configManager.getConfig(EasyMixologyConfig.class);
     }
 }
+

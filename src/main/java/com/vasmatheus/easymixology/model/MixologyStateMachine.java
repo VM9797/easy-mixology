@@ -1,5 +1,6 @@
 package com.vasmatheus.easymixology.model;
 
+import com.vasmatheus.easymixology.EasyMixologyConfig;
 import com.vasmatheus.easymixology.model.enums.MixologyState;
 import com.vasmatheus.easymixology.model.enums.Potion;
 import com.vasmatheus.easymixology.model.enums.PotionComponent;
@@ -17,7 +18,10 @@ import java.util.Set;
 @Singleton
 public class MixologyStateMachine {
     @Inject
-    Client client;
+    private Client client;
+
+    @Inject
+    private EasyMixologyConfig config;
 
     private MixologyOrder order = MixologyOrder.EMPTY;
 
@@ -47,13 +51,15 @@ public class MixologyStateMachine {
 
     public void start() {
         isStarted = true;
-        order = MixologyOrder.fromVarbits(client);
+        order = MixologyOrder.fromVarbits(client, config.potionSelectionStrategy());
         state = MixologyState.MIXING;
         variablesSnapshot = MixologyVariablesSnapshot.fromVarbits(client);
+
+        processMixingState(variablesSnapshot);
     }
 
-    public void onVarbitsUpdated() {
-        var orderFromVarbits = MixologyOrder.fromVarbits(client);
+    public void update() {
+        var orderFromVarbits = MixologyOrder.fromVarbits(client, config.potionSelectionStrategy());
         var variablesFromVarbits = MixologyVariablesSnapshot.fromVarbits(client);
 
         if (!order.doesEqual(orderFromVarbits) || !order.isValidOrder) {
@@ -67,16 +73,16 @@ public class MixologyStateMachine {
 
         switch (state) {
             case MIXING:
-                processMixingState(client, variablesFromVarbits);
+                processMixingState(variablesFromVarbits);
                 break;
             case MIX_READY:
-                processPotionReadyState(client, variablesFromVarbits);
+                processPotionReadyState(variablesFromVarbits);
                 break;
             case READY_TO_REFINE:
-                processReadyToRefineState(client, variablesFromVarbits);
+                processReadyToRefineState(variablesFromVarbits);
                 break;
             case REFINING:
-                processRefiningState(client, variablesFromVarbits);
+                processRefiningState(variablesFromVarbits);
                 break;
         }
 
@@ -96,13 +102,13 @@ public class MixologyStateMachine {
         return new HashSet<>(componentsToAdd);
     }
 
-    private void processMixingState(Client client, MixologyVariablesSnapshot nextSnapshot) {
+    private void processMixingState(MixologyVariablesSnapshot nextSnapshot) {
         if (nextSnapshot.potionInVessel == order.mostValuablePotion) {
             state = MixologyState.MIX_READY;
         }
     }
 
-    private void processPotionReadyState(Client client, MixologyVariablesSnapshot nextSnapshot) {
+    private void processPotionReadyState(MixologyVariablesSnapshot nextSnapshot) {
         if (nextSnapshot.potionInVessel == Potion.NONE) {
             state = MixologyState.READY_TO_REFINE;
         } else if (nextSnapshot.potionInVessel != variablesSnapshot.potionInVessel) {
@@ -110,7 +116,7 @@ public class MixologyStateMachine {
         }
     }
 
-    private void processReadyToRefineState(Client client, MixologyVariablesSnapshot nextSnapshot) {
+    private void processReadyToRefineState(MixologyVariablesSnapshot nextSnapshot) {
         switch (order.mostValuablePotionRefinement) {
             case AGITATOR:
                 if (variablesSnapshot.agitatorLevel < nextSnapshot.agitatorLevel) {
@@ -128,7 +134,7 @@ public class MixologyStateMachine {
     }
 
 
-    private void processRefiningState(Client client, MixologyVariablesSnapshot nextSnapshot) {
+    private void processRefiningState(MixologyVariablesSnapshot nextSnapshot) {
         switch (order.mostValuablePotionRefinement) {
             case AGITATOR:
                 if (variablesSnapshot.agitatorLevel > 9 && nextSnapshot.agitatorLevel == 0) {
