@@ -44,24 +44,28 @@ Infobox and the herb!
 - Considering potions inventory
 
 ## Changelog
-#### 1.0.0 - Initial release
+### 1.4.0
 
-- Basic functionality
-- Object color highlight configuration
+- Update plugin to work with 3 potion orders instead of one as of mixology hotfix 
 
-#### 1.1.0
+### 1.3.0
 
-- Highlight agitator and refinery objects when speedup action is possible
-- Add potion selection strategy
+- Added text overlay for levers to indicate pull count
+- Added digweed highlight
 
-#### 1.2.0
+### 1.2.0
 
 - Added overlay box to display several information
 - Added hopper level tracking and low level highlighting
 - Added more customizability options
 - Added player reward points tracking
 
-#### 1.3.0
+### 1.1.0
 
-- Added text overlay for levers to indicate pull count
-- Added digweed highlight
+- Highlight agitator and refinery objects when speedup action is possible
+- Add potion selection strategy
+
+### 1.0.0 - Initial release
+
+- Basic functionality
+- Object color highlight configuration
