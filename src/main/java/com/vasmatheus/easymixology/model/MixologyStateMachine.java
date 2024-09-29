@@ -59,8 +59,12 @@ public class MixologyStateMachine {
         return order.refinementTypes.get(currentlyProcessingPotionIndex + 1);
     }
 
+    private int getLastPotionIndex() {
+        return order.getNumberOfPotionsToDo() - 1;
+    }
+
     public boolean isLastPotion() {
-        return currentlyProcessingPotionIndex == order.getNumberOfPotionsToDo();
+        return currentlyProcessingPotionIndex == getLastPotionIndex();
     }
 
     public void stop() {
@@ -125,7 +129,7 @@ public class MixologyStateMachine {
 
     private void updateLeversToPull() {
         var targetPotion = getTargetPotion();
-        var nextPotion = currentlyProcessingPotionIndex == order.getNumberOfPotionsToDo() ? null : order.potions.get(currentlyProcessingPotionIndex + 1);
+        var nextPotion = currentlyProcessingPotionIndex == getLastPotionIndex() ? null : order.potions.get(currentlyProcessingPotionIndex + 1);
 
         var leversToPull = new ArrayList<>(Arrays.asList(targetPotion.firstComponent, targetPotion.secondComponent,
                 targetPotion.thirdComponent));
@@ -160,7 +164,7 @@ public class MixologyStateMachine {
     }
 
     private void processPotionReadyState(MixologyVariablesSnapshot nextSnapshot) {
-        if (nextSnapshot.potionInVessel == Potion.NONE && currentlyProcessingPotionIndex < order.getNumberOfPotionsToDo()) {
+        if (nextSnapshot.potionInVessel == Potion.NONE && currentlyProcessingPotionIndex < getLastPotionIndex()) {
             state = MixologyState.MIXING;
             currentlyProcessingPotionIndex++;
         } else if (nextSnapshot.potionInVessel == Potion.NONE) {
@@ -209,7 +213,7 @@ public class MixologyStateMachine {
         }
 
         if (state == MixologyState.READY_TO_DEPOSIT) {
-            if (currentlyProcessingPotionIndex < order.getNumberOfPotionsToDo()) {
+            if (currentlyProcessingPotionIndex < getLastPotionIndex()) {
                 state = MixologyState.READY_TO_REFINE;
                 currentlyProcessingPotionIndex++;
             } else {
