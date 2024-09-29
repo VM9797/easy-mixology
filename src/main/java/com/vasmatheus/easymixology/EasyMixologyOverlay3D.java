@@ -56,20 +56,28 @@ public class EasyMixologyOverlay3D extends Overlay {
 
         switch (state.getState()) {
             case MIXING:
-                outlineLevers(graphics);
+                outlineLevers(graphics, false);
                 outlineHopper();
                 break;
             case MIX_READY:
                 outlineVessel();
-                outlineRefinery(true);
+                if (state.isLastPotion()) {
+                    outlineRefinery(true, false);
+                } else {
+                    outlineLevers(graphics, true);
+                }
                 outlineHopper();
                 break;
             case READY_TO_REFINE:
             case REFINING:
-                outlineRefinery(false);
+                outlineRefinery(false, !state.isLastPotion());
+
+                if (state.isLastPotion()) {
+                    drawConveyorBelt(true);
+                }
                 break;
             case READY_TO_DEPOSIT:
-                drawConveyorBelt();
+                drawConveyorBelt(false);
                 break;
         }
 
@@ -86,20 +94,32 @@ public class EasyMixologyOverlay3D extends Overlay {
         outlineObject(uiHelper.getMatureDigweedObjectOrNull(), config.digweedOutline());
     }
 
-    private void outlineRefinery(boolean preDraw) {
+    private void outlineRefinery(boolean preDraw, boolean preDrawNext) {
         if (agitator == null || alembic == null || retort == null) {
             return;
         }
 
-        var targetRefinery = state.getTargetRefinementType() == RefinementType.AGITATOR ? agitator :
-                state.getTargetRefinementType() == RefinementType.ALEMBIC ? alembic : retort;
+        var primaryTargetRefinement = preDraw ? state.getFirstTargetRefinementType() : state.getTargetRefinementType();
 
-        if (targetRefinery == alembic && config.isStationSpeedupHighlightEnabled() && uiHelper.isAlembicSpeedupObjectPresent()) {
-            outlineObject(targetRefinery, config.refinerySpeedupOutline());
+        var primaryTargetRefinery = primaryTargetRefinement == RefinementType.AGITATOR ? agitator :
+                primaryTargetRefinement == RefinementType.ALEMBIC ? alembic : retort;
+
+        var secondaryTargetRefinement = preDrawNext ? state.getNextTargetRefinementType() : RefinementType.NONE;
+
+        var secondaryTargetRefinery = secondaryTargetRefinement == RefinementType.AGITATOR ? agitator :
+                secondaryTargetRefinement == RefinementType.ALEMBIC ? alembic : secondaryTargetRefinement == RefinementType.RETORT ?
+                        retort : null;
+
+        if (secondaryTargetRefinery != null && secondaryTargetRefinery != primaryTargetRefinery) {
+            outlineObject(secondaryTargetRefinery, config.refineryPreOutline());
+        }
+
+        if (primaryTargetRefinery == alembic && config.isStationSpeedupHighlightEnabled() && uiHelper.isAlembicSpeedupObjectPresent()) {
+            outlineObject(primaryTargetRefinery, config.refinerySpeedupOutline());
             return;
         }
-        else if (targetRefinery == agitator && config.isStationSpeedupHighlightEnabled() && uiHelper.isAgitatorSpeedupObjectPresent()) {
-            outlineObject(targetRefinery, config.refinerySpeedupOutline());
+        else if (primaryTargetRefinery == agitator && config.isStationSpeedupHighlightEnabled() && uiHelper.isAgitatorSpeedupObjectPresent()) {
+            outlineObject(primaryTargetRefinery, config.refinerySpeedupOutline());
             return;
         }
 
@@ -107,7 +127,7 @@ public class EasyMixologyOverlay3D extends Overlay {
             return;
         }
 
-        outlineObject(targetRefinery, preDraw ? config.refineryPreOutline() : config.refineryOutline());
+        outlineObject(primaryTargetRefinery, preDraw ? config.refineryPreOutline() : config.refineryOutline());
     }
 
     private void outlineVessel() {
@@ -118,20 +138,29 @@ public class EasyMixologyOverlay3D extends Overlay {
         outlineObject(vessel, config.vesselOutline());
     }
 
-    private void outlineLevers(Graphics2D graphics) {
-        var pullCountMap = state.getLeversToPullMap();
+    private void outlineLevers(Graphics2D graphics, boolean preDraw) {
+        var pullCountMap = preDraw ? state.getLeversToPullNextPotionMap() : state.getLeversToPullMap();
         var componentsToAdd = pullCountMap.keySet();
 
         for (var component : componentsToAdd) {
             if (component == PotionComponent.LYE && lyeLever != null && pullCountMap.get(component) != 0) {
-                outlineTargetLever(lyeLever, config.lyeLeverOutline());
-                drawLeverPullCount(lyeLever, pullCountMap.get(component), config.lyeLeverOutline(), graphics);
+                outlineTargetLever(lyeLever, preDraw ? config.lyeLeverPreOutline() : config.lyeLeverOutline());
+
+                if (!preDraw) {
+                    drawLeverPullCount(lyeLever, pullCountMap.get(component), config.lyeLeverOutline(), graphics);
+                }
             } else if (component == PotionComponent.AGA && agaLever != null && pullCountMap.get(component) != 0) {
-                outlineTargetLever(agaLever, config.agaLeverOutline());
-                drawLeverPullCount(agaLever, pullCountMap.get(component), config.agaLeverOutline(), graphics);
+                outlineTargetLever(agaLever, preDraw ? config.agaLeverPreOutline() : config.agaLeverOutline());
+
+                if (!preDraw) {
+                    drawLeverPullCount(agaLever, pullCountMap.get(component), config.agaLeverOutline(), graphics);
+                }
             } else if (component == PotionComponent.MOX && moxLever != null && pullCountMap.get(component) != 0) {
-                outlineTargetLever(moxLever, config.moxLeverOutline());
-                drawLeverPullCount(moxLever, pullCountMap.get(component), config.moxLeverOutline(), graphics);
+                outlineTargetLever(moxLever, preDraw ? config.moxLeverPreOutline() : config.moxLeverOutline());
+
+                if (!preDraw) {
+                    drawLeverPullCount(moxLever, pullCountMap.get(component), config.moxLeverOutline(), graphics);
+                }
             }
         }
     }
@@ -158,13 +187,13 @@ public class EasyMixologyOverlay3D extends Overlay {
         OverlayUtil.renderTextLocation(graphics, pos, text, color);
     }
 
-    private void drawConveyorBelt() {
+    private void drawConveyorBelt(boolean preDraw) {
         if (!config.isConveyorBeltHighlightEnabled()) {
             return;
         }
 
         for (var conveyorBelt : conveyorBelts) {
-            outlineObject(conveyorBelt, config.conveyorBeltOutline());
+            outlineObject(conveyorBelt, preDraw ? config.conveyorBeltPreOutline() : config.conveyorBeltOutline());
         }
     }
 

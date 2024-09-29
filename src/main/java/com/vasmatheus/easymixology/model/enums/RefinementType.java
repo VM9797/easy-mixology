@@ -4,13 +4,14 @@ import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
 public enum RefinementType {
-    AGITATOR("Agitator", 1),
-    RETORT("Retort", 2),
-    ALEMBIC("Alembic", 3),
-    NONE("", 0);
+    AGITATOR("Agitator", 1, 3),
+    RETORT("Retort", 2, 2),
+    ALEMBIC("Alembic", 3, 1),
+    NONE("", 0, 0);
 
     public final String displayName;
     public final int varbitValue;
+    public final int orderValue;
 
     public static RefinementType fromVarbitValue(int varbitValue) {
         switch (varbitValue) {

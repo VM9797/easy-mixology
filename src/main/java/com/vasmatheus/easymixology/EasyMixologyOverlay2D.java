@@ -59,10 +59,10 @@ public class EasyMixologyOverlay2D extends OverlayPanel {
                         colorCodeString(stats.getPlayerLyeCount() == -1 ? "?" : String.valueOf(stats.getPlayerLyeCount()), LYE_COLOR))
                 .build());
 
-        panelComponent.getChildren().add(LineComponent.builder()
-                .left("Strategy")
-                .right(config.potionSelectionStrategy().toString())
-                .build());
+//        panelComponent.getChildren().add(LineComponent.builder()
+//                .left("Strategy")
+//                .right(config.potionSelectionStrategy().toString())
+//                .build());
 
 
         panelComponent.getChildren().add(LineComponent.builder()

@@ -37,7 +37,8 @@ public interface EasyMixologyConfig extends Config {
             name = "Potion strategy",
             description = "Which strategy should the plugin use to select the target potion to make. For Prefer Retort, XP is used as a " +
                     "fallback value to select the best retort option, or the next best option if no retort is available",
-            section = optionsSection
+            section = optionsSection,
+            hidden = true
     )
     default PotionSelectionStrategy potionSelectionStrategy()
     {
@@ -319,6 +320,54 @@ public interface EasyMixologyConfig extends Config {
     )
     default Color digweedInfoboxHighlight() {
         return new Color(32, 125, 32, 108);
+    }
+
+    @Alpha
+    @ConfigItem(
+            position = 12,
+            keyName = "moxLeverPreOutline",
+            name = "Mox lever pre outline",
+            description = "Color to use to pre outline the Mox lever",
+            section = highlightColorSection
+    )
+    default Color moxLeverPreOutline() {
+        return new Color(0, 0, 255, 100);
+    }
+
+    @Alpha
+    @ConfigItem(
+            position = 13,
+            keyName = "agaLeverPreOutline",
+            name = "Aga lever pre outline",
+            description = "Color to use to pre outline the Aga lever",
+            section = highlightColorSection
+    )
+    default Color agaLeverPreOutline() {
+        return new Color(0, 255, 0, 100);
+    }
+
+    @Alpha
+    @ConfigItem(
+            position = 14,
+            keyName = "lyeLeverPreOutline",
+            name = "Lye lever pre outline",
+            description = "Color to use to pre outline the Lye lever",
+            section = highlightColorSection
+    )
+    default Color lyeLeverPreOutline() {
+        return new Color(255, 0, 0, 100);
+    }
+
+    @Alpha
+    @ConfigItem(
+            position = 15,
+            keyName = "conveyorBeltPreOutline",
+            name = "Conveyor belt pre outline",
+            description = "Color to use to pre outline the conveyor belts",
+            section = highlightColorSection
+    )
+    default Color conveyorBeltPreOutline() {
+        return new Color(255, 255, 0, 120);
     }
 
     @ConfigItem(

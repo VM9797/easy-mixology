@@ -4,31 +4,35 @@ import com.vasmatheus.easymixology.constants.MixologyVarbits;
 import com.vasmatheus.easymixology.model.enums.Potion;
 import com.vasmatheus.easymixology.model.enums.PotionSelectionStrategy;
 import com.vasmatheus.easymixology.model.enums.RefinementType;
+import lombok.Getter;
 import net.runelite.api.Client;
 import net.runelite.api.Skill;
 import org.apache.commons.lang3.tuple.Pair;
 
+import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class MixologyOrder {
     public static final MixologyOrder EMPTY = new MixologyOrder(Potion.NONE, Potion.NONE, Potion.NONE, RefinementType.NONE,
             RefinementType.NONE, RefinementType.NONE, 60, PotionSelectionStrategy.REWARD_SHOP_BALANCE);
 
-    // High base value to ensure priority
-    private static final int RETORT_REFINERY_VALUE = 10000;
+    private final Potion firstPotion;
+    private final Potion secondPotion;
+    private final Potion thirdPotion;
 
-    public final Potion firstPotion;
-    public final Potion secondPotion;
-    public final Potion thirdPotion;
+    private final RefinementType firstPotionRefinement;
+    private final RefinementType secondPotionRefinement;
+    private final RefinementType thirdPotionRefinement;
+    public final List<Potion> potions = new ArrayList<>();
+    public final List<RefinementType> refinementTypes = new ArrayList<>();
 
-    public final RefinementType firstPotionRefinement;
-    public final RefinementType secondPotionRefinement;
-    public final RefinementType thirdPotionRefinement;
-
-    public final Potion mostValuablePotion;
-    public final RefinementType mostValuablePotionRefinement;
     public final boolean isValidOrder;
+
+    @Getter
+    private int numberOfPotionsToDo = 0;
 
     private final int playerHerbloreLevel;
     private final PotionSelectionStrategy strategy;
@@ -46,26 +50,30 @@ public class MixologyOrder {
         this.playerHerbloreLevel = playerHerbloreLevel;
         this.strategy = strategy;
 
-        var potionStream = Stream.of(Pair.of(firstPotion, firstPotionRefinement), Pair.of(secondPotion, secondPotionRefinement),
-                Pair.of(thirdPotion, thirdPotionRefinement));
-        var targetPair =
-                potionStream.filter(it -> it.getLeft().herbloreLevel <= playerHerbloreLevel).max(Comparator.comparingInt(p -> selectPotionComparisonProperty(p, strategy)));
+        var potions = Stream.of(Pair.of(firstPotion, firstPotionRefinement),
+                Pair.of(secondPotion,
+                        secondPotionRefinement),
+                Pair.of(thirdPotion, thirdPotionRefinement))
+//                .filter(it -> it.getLeft().moxValue < 30)
+                .sorted(Comparator.comparingInt(a -> a.getRight().orderValue))
+                .collect(Collectors.toList());
 
-        if (targetPair.isPresent()) {
-            mostValuablePotion = targetPair.get().getLeft();
-            mostValuablePotionRefinement = targetPair.get().getRight();
+        if (potions.isEmpty()) {
+            this.potions.add(firstPotion);
+            numberOfPotionsToDo = 1;
         } else {
-            mostValuablePotion = Potion.NONE;
-            mostValuablePotionRefinement = RefinementType.NONE;
+            for (var potion : potions) {
+                this.potions.add(potion.getLeft());
+                this.refinementTypes.add(potion.getRight());
+                numberOfPotionsToDo++;
+            }
         }
 
         isValidOrder =
                 firstPotion != Potion.NONE && secondPotion != Potion.NONE && thirdPotion != Potion.NONE &&
                         firstPotionRefinement != RefinementType.NONE &&
                         secondPotionRefinement != RefinementType.NONE &&
-                        thirdPotionRefinement != RefinementType.NONE &&
-                        mostValuablePotion != Potion.NONE &&
-                        mostValuablePotionRefinement != RefinementType.NONE;
+                        thirdPotionRefinement != RefinementType.NONE;
     }
 
     public static MixologyOrder fromVarbits(Client client, PotionSelectionStrategy strategy) {
@@ -88,29 +96,7 @@ public class MixologyOrder {
                 firstPotionRefinement == other.firstPotionRefinement &&
                 secondPotionRefinement == other.secondPotionRefinement &&
                 thirdPotionRefinement == other.thirdPotionRefinement &&
-                mostValuablePotion == other.mostValuablePotion &&
-                mostValuablePotionRefinement == other.mostValuablePotionRefinement &&
                 playerHerbloreLevel == other.playerHerbloreLevel &&
                 strategy == other.strategy;
-    }
-
-    private static int selectPotionComparisonProperty(Pair<Potion, RefinementType> pair, PotionSelectionStrategy strategy) {
-        var potion = pair.getLeft();
-        var refinementType = pair.getRight();
-        switch (strategy) {
-            case PREFER_RETORT:
-                return refinementType == RefinementType.RETORT ? RETORT_REFINERY_VALUE + potion.totalXP : potion.totalXP;
-            case REWARD_SHOP_BALANCE:
-                return potion.potionShopValue;
-            case AGA:
-                return potion.agaValue;
-            case LYE:
-                return potion.lyeValue;
-            case MOX:
-                return potion.moxValue;
-            case HIGHEST_XP:
-            default:
-                return potion.totalXP;
-        }
     }
 }
