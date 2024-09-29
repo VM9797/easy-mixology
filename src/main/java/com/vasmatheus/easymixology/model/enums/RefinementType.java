@@ -4,8 +4,8 @@ import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
 public enum RefinementType {
-    AGITATOR("Agitator", 1, 3),
-    RETORT("Retort", 2, 2),
+    AGITATOR("Agitator", 1, 2),
+    RETORT("Retort", 2, 3),
     ALEMBIC("Alembic", 3, 1),
     NONE("", 0, 0);
 
