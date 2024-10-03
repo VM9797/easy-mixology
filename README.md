@@ -44,6 +44,10 @@ Infobox and the herb!
 - Considering potions inventory
 
 ## Changelog
+### 1.5.2
+
+- Add consumable rewards to reward targets
+
 ### 1.5.1
 
 - Update default colors
