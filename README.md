@@ -44,6 +44,14 @@ Infobox and the herb!
 - Considering potions inventory
 
 ## Changelog
+### 1.5.0
+
+- Update overlay to display stats
+- Added session tracking
+- Added goal targets
+- Added station highlight texts
+- Changed strategy to discard only MMM and AAA potions
+
 ### 1.4.0
 
 - Update plugin to work with 3 potion orders instead of one as of mixology hotfix 
