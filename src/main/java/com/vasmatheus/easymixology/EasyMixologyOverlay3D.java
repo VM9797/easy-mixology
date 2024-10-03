@@ -231,7 +231,7 @@ public class EasyMixologyOverlay3D extends Overlay {
 
     private boolean isHopperOutlineNeeded() {
         var potion = state.getTargetPotion();
-        return potion.moxValue > stats.getHopperMoxCount() || potion.agaValue > stats.getHopperAgaCount() || potion.lyeValue > stats.getHopperLyeCount();
+        return potion.moxPasteRequirement > stats.getHopperMoxCount() || potion.agaPasteRequirement > stats.getHopperAgaCount() || potion.lyePasteRequirement > stats.getHopperLyeCount();
     }
 
 }
