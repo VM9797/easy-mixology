@@ -157,6 +157,22 @@ public class MixologyStats {
             targetLye += reward.lyeCost;
         }
 
+        targetMox += config.apprenticePotionPackCount() * MixologyRewards.ApprenticePotionPack.moxCost;
+        targetAga += config.apprenticePotionPackCount() * MixologyRewards.ApprenticePotionPack.agaCost;
+        targetLye += config.apprenticePotionPackCount() * MixologyRewards.ApprenticePotionPack.lyeCost;
+
+        targetMox += config.adeptPotionPackCount() * MixologyRewards.AdeptPotionPack.moxCost;
+        targetAga += config.adeptPotionPackCount() * MixologyRewards.AdeptPotionPack.agaCost;
+        targetLye += config.adeptPotionPackCount() * MixologyRewards.AdeptPotionPack.lyeCost;
+
+        targetMox += config.expertPotionPackCount() * MixologyRewards.ExpertPotionPack.moxCost;
+        targetAga += config.expertPotionPackCount() * MixologyRewards.ExpertPotionPack.agaCost;
+        targetLye += config.expertPotionPackCount() * MixologyRewards.ExpertPotionPack.lyeCost;
+
+        targetMox += config.aldariumCount() * MixologyRewards.Aldarium.moxCost;
+        targetAga += config.aldariumCount() * MixologyRewards.Aldarium.agaCost;
+        targetLye += config.aldariumCount() * MixologyRewards.Aldarium.lyeCost;
+
 
         targetMoxPercent = Integer.min((int)(100.0 * ((double)playerMoxCount / (double)targetMox)), 100);
         targetAgaPercent = Integer.min((int)(100.0 * ((double)playerAgaCount / (double)targetAga)), 100);

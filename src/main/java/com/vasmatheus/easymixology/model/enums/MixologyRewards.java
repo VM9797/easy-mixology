@@ -15,6 +15,7 @@ public enum MixologyRewards {
     PotionStorage("Potion storage", 7750, 6300, 8950),
     ChuggingBarrel("Chugging barrel", 17250, 14000, 18600),
     AlchemistsAmulet("Alchemist's amulet", 6900, 5650, 7400),
+    Aldarium("Aldarium", 80, 60, 90),
     ;
 
     public final String itemName;

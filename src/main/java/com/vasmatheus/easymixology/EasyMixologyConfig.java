@@ -8,6 +8,7 @@ import java.awt.*;
 @ConfigGroup(EasyMixologyConfig.GROUP)
 public interface EasyMixologyConfig extends Config {
     String GROUP = "easymixology";
+    int MULTI_REWARD_UPPER_LIMIT = 10000;
 
     @ConfigSection(
             name = "Options",
@@ -537,5 +538,53 @@ public interface EasyMixologyConfig extends Config {
     default boolean alchemistsAmulet()
     {
         return false;
+    }
+
+    @ConfigItem(
+            keyName = "apprenticePotionPackCount",
+            name = "Apprentice potion pack",
+            description = "Number of apprentice potion packs to target",
+            section = targetRewardsSection
+    )
+    @Range(max = EasyMixologyConfig.MULTI_REWARD_UPPER_LIMIT)
+    default int apprenticePotionPackCount()
+    {
+        return 0;
+    }
+
+    @ConfigItem(
+            keyName = "adeptPotionPackCount",
+            name = "Adept potion pack",
+            description = "Number of adept potion packs to target",
+            section = targetRewardsSection
+    )
+    @Range(max = EasyMixologyConfig.MULTI_REWARD_UPPER_LIMIT)
+    default int adeptPotionPackCount()
+    {
+        return 0;
+    }
+
+    @ConfigItem(
+            keyName = "expertPotionPackCount",
+            name = "Expert potion pack",
+            description = "Number of expert potion packs to target",
+            section = targetRewardsSection
+    )
+    @Range(max = EasyMixologyConfig.MULTI_REWARD_UPPER_LIMIT)
+    default int expertPotionPackCount()
+    {
+        return 0;
+    }
+
+    @ConfigItem(
+            keyName = "aldariumCount",
+            name = "Aldarium",
+            description = "Number of aldariums to target",
+            section = targetRewardsSection
+    )
+    @Range(max = EasyMixologyConfig.MULTI_REWARD_UPPER_LIMIT)
+    default int aldariumCount()
+    {
+        return 0;
     }
 }
