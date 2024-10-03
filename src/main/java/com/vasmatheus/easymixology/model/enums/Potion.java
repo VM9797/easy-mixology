@@ -31,6 +31,9 @@ public enum Potion {
     public final int moxValue;
     public final int agaValue;
     public final int lyeValue;
+    public final boolean isAllMox;
+    public final boolean isAllAga;
+    public final boolean isAllLye;
 
 
     Potion(String potionName, PotionComponent firstComponent, PotionComponent secondComponent, PotionComponent thirdComponent,
@@ -80,6 +83,10 @@ public enum Potion {
         agaValue = agaCount * 10;
         moxValue = moxCount * 10;
         lyeValue = lyeCount * 10;
+
+        isAllMox = moxCount == 3;
+        isAllAga = agaCount == 3;
+        isAllLye = lyeCount == 3;
     }
 
     public static Potion fromVarbitValue(int varbitValue) {

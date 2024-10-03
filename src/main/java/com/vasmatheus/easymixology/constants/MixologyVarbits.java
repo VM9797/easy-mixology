@@ -27,9 +27,9 @@ public class MixologyVarbits {
     public final static int PLAYER_AGA_COUNT = 4415;
     public final static int PLAYER_LYE_COUNT = 4414;
 
-    public final static int HOPPER_MOX_COUNT = 11321;
-    public final static int HOPPER_AGA_COUNT = 11322;
-    public final static int HOPPER_LYE_COUNT = 11323;
+    public final static int HOPPER_MOX_COUNT = 11431;
+    public final static int HOPPER_AGA_COUNT = 11432;
+    public final static int HOPPER_LYE_COUNT = 11433;
 
 
     private final static List<Integer> relevantVarbits = Arrays.asList(

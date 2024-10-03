@@ -62,7 +62,7 @@ public class EasyMixologyOverlay3D extends Overlay {
             case MIX_READY:
                 outlineVessel();
                 if (state.isLastPotion()) {
-                    outlineRefinery(true, false);
+                    outlineRefinery(true, false, graphics);
                 } else {
                     outlineLevers(graphics, true);
                 }
@@ -70,7 +70,7 @@ public class EasyMixologyOverlay3D extends Overlay {
                 break;
             case READY_TO_REFINE:
             case REFINING:
-                outlineRefinery(false, !state.isLastPotion());
+                outlineRefinery(false, !state.isLastPotion(), graphics);
 
                 if (state.isLastPotion()) {
                     drawConveyorBelt(true);
@@ -94,7 +94,7 @@ public class EasyMixologyOverlay3D extends Overlay {
         outlineObject(uiHelper.getMatureDigweedObjectOrNull(), config.digweedOutline());
     }
 
-    private void outlineRefinery(boolean preDraw, boolean preDrawNext) {
+    private void outlineRefinery(boolean preDraw, boolean preDrawNext, Graphics2D graphics) {
         if (agitator == null || alembic == null || retort == null) {
             return;
         }
@@ -112,6 +112,17 @@ public class EasyMixologyOverlay3D extends Overlay {
 
         if (secondaryTargetRefinery != null && secondaryTargetRefinery != primaryTargetRefinery) {
             outlineObject(secondaryTargetRefinery, config.refineryPreOutline());
+        }
+
+        if (config.isStationProcessCountEnabled() && !preDraw) {
+            var stationOffset = config.stationTextOffset();
+            int xOffset = primaryTargetRefinement == RefinementType.ALEMBIC ? -stationOffset : primaryTargetRefinement == RefinementType.RETORT ?
+                    stationOffset : 0;
+            int yOffset = primaryTargetRefinement == RefinementType.AGITATOR ? stationOffset : 0;
+            int zOffset = 250;
+
+            drawTextAtObject(primaryTargetRefinery, String.format("%dx", state.getRefinementTypeCountMap().get(primaryTargetRefinement)),
+                    config.refineryOutline(), graphics, xOffset, yOffset, zOffset);
         }
 
         if (primaryTargetRefinery == alembic && config.isStationSpeedupHighlightEnabled() && uiHelper.isAlembicSpeedupObjectPresent()) {
@@ -180,11 +191,19 @@ public class EasyMixologyOverlay3D extends Overlay {
             return;
         }
 
-        String text = String.format("%dx", pullCount);
-        LocalPoint crucibleLoc = targetLever.getLocalLocation();
-        crucibleLoc = new LocalPoint(crucibleLoc.getX(), crucibleLoc.getY());
-        Point pos = Perspective.getCanvasTextLocation(client, graphics, crucibleLoc, text, 250);
+        drawTextAtObject(targetLever, String.format("%dx", pullCount), color, graphics, 0, 0, 250);
+    }
+
+    private void drawTextAtObject(TileObject object, String text, Color color, Graphics2D graphics, int xOffset, int yOffset, int zOffset) {
+        LocalPoint localPoint = object.getLocalLocation();
+        localPoint = new LocalPoint(localPoint.getX() + xOffset, localPoint.getY() + yOffset);
+        Point pos = Perspective.getCanvasTextLocation(client, graphics, localPoint, text, zOffset);
+
+        var originalFont = graphics.getFont();
+        var textFont = new Font(originalFont.getFontName(), originalFont.getStyle(), originalFont.getSize() + config.textSize());
+        graphics.setFont(textFont);
         OverlayUtil.renderTextLocation(graphics, pos, text, color);
+        graphics.setFont(originalFont);
     }
 
     private void drawConveyorBelt(boolean preDraw) {
@@ -198,7 +217,7 @@ public class EasyMixologyOverlay3D extends Overlay {
     }
 
     private void outlineHopper() {
-        if (hopper == null || !isHopperOutlineNeeded()) {
+        if (hopper == null || !isHopperOutlineNeeded() || !config.isEmptyHopperHighlightEnabled()) {
             return;
         }
 

@@ -38,6 +38,9 @@ public class MixologyStateMachine {
     private final Map<PotionComponent, Integer> leversToPullNextPotionMap = new HashMap<>();
 
     @Getter
+    private final Map<RefinementType, Integer> refinementTypeCountMap = new HashMap<>();
+
+    @Getter
     private int currentlyProcessingPotionIndex = 0;
 
     public Potion getTargetPotion() {
@@ -170,6 +173,7 @@ public class MixologyStateMachine {
         } else if (nextSnapshot.potionInVessel == Potion.NONE) {
             state = MixologyState.READY_TO_REFINE;
             currentlyProcessingPotionIndex = 0;
+            updateRefinementTypeCountMap();
         } else if (nextSnapshot.potionInVessel != variablesSnapshot.potionInVessel) {
             state = MixologyState.MIXING;
         }
@@ -190,6 +194,7 @@ public class MixologyStateMachine {
                     state = MixologyState.REFINING;
                 }
         }
+        updateRefinementTypeCountMap();
     }
 
 
@@ -219,6 +224,19 @@ public class MixologyStateMachine {
             } else {
                 currentlyProcessingPotionIndex = 0;
             }
+        }
+        updateRefinementTypeCountMap();
+    }
+
+    private void updateRefinementTypeCountMap() {
+        var refinementTypes = order.refinementTypes;
+        for (var refinement: RefinementType.values()) {
+            refinementTypeCountMap.put(refinement, 0);
+        }
+
+        for (var i = currentlyProcessingPotionIndex; i <= getLastPotionIndex(); i++) {
+            var refinementType = refinementTypes.get(i);
+            refinementTypeCountMap.put(refinementType, refinementTypeCountMap.get(refinementType) + 1);
         }
     }
 }

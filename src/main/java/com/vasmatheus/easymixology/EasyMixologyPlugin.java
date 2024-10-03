@@ -26,7 +26,7 @@ import javax.inject.Inject;
         tags = {"mastering", "mixology", "minigame", "herblore", "alchemy", "lab", "herb", "paste", "mox", "lye", "aga", "potion"}
 )
 public class EasyMixologyPlugin extends Plugin {
-    private static final int ARE_BOOTSTRAP_TICK_COUNTER_START = 4;
+    private static final int AREA_BOOTSTRAP_TICK_COUNTER_START = 3;
 
     @Inject
     private Client client;
@@ -52,7 +52,7 @@ public class EasyMixologyPlugin extends Plugin {
     @Inject
     private ClientThread clientThread;
 
-    private int areaBootstrapTickCounter = ARE_BOOTSTRAP_TICK_COUNTER_START;
+    private int areaBootstrapTickCounter = AREA_BOOTSTRAP_TICK_COUNTER_START;
     private boolean inArea = false;
 
     @Override
@@ -191,7 +191,7 @@ public class EasyMixologyPlugin extends Plugin {
         } else {
             if (inArea) {
                 inArea = false;
-                areaBootstrapTickCounter = ARE_BOOTSTRAP_TICK_COUNTER_START;
+                areaBootstrapTickCounter = AREA_BOOTSTRAP_TICK_COUNTER_START;
                 state.stop();
             }
         }
@@ -214,7 +214,10 @@ public class EasyMixologyPlugin extends Plugin {
     public void onConfigChanged(ConfigChanged configChanged)
     {
         if (configChanged.getGroup().equals(EasyMixologyConfig.GROUP)) {
-            clientThread.invoke(() -> state.onVarbitUpdate());
+            clientThread.invoke(() -> {
+                state.onVarbitUpdate();
+                stats.onConfigChanged();
+            });
         }
     }
 

@@ -25,11 +25,18 @@ public interface EasyMixologyConfig extends Config {
 
 
     @ConfigSection(
-            name = "Highlight color style",
-            description = "Styles for highlighting colors of mixology objects",
+            name = "Outline and text configuration",
+            description = "Configuration for highlights and texts",
             position = 2
     )
-    String highlightStyleSection = "highlightStyleSection";
+    String outlineAndTextConfiguration = "outlineAndTextConfiguration";
+
+    @ConfigSection(
+            name = "Target rewards",
+            description = "Target rewards toggles section",
+            position = 2
+    )
+    String targetRewardsSection = "targetRewardsSection";
 
     @ConfigItem(
             position = 0,
@@ -177,6 +184,18 @@ public interface EasyMixologyConfig extends Config {
         return true;
     }
 
+    @ConfigItem(
+            position = 12,
+            keyName = "isStationProcessCountEnabled",
+            name = "Display station process count",
+            description = "Toggles to display the number of actions left at a refinery station",
+            section = optionsSection
+    )
+    default boolean isStationProcessCountEnabled()
+    {
+        return true;
+    }
+
 
     @Alpha
     @ConfigItem(
@@ -247,7 +266,7 @@ public interface EasyMixologyConfig extends Config {
             section = highlightColorSection
     )
     default Color refineryPreOutline() {
-        return new Color(255, 255, 0, 120);
+        return new Color(255, 255, 0, 90);
     }
 
     @Alpha
@@ -367,15 +386,14 @@ public interface EasyMixologyConfig extends Config {
             section = highlightColorSection
     )
     default Color conveyorBeltPreOutline() {
-        return new Color(255, 255, 0, 120);
+        return new Color(255, 255, 0, 90);
     }
 
     @ConfigItem(
-            position = 0,
             keyName = "outlineFeather",
             name = "Outline feather",
             description = "Specify between 0-4 how much of the model outline should be faded",
-            section = highlightStyleSection
+            section = outlineAndTextConfiguration
     )
     @Range(
             min = 0,
@@ -387,15 +405,126 @@ public interface EasyMixologyConfig extends Config {
     }
 
     @ConfigItem(
-            position = 1,
             keyName = "borderWidth",
             name = "Border width",
             description = "Width of the object outline border",
-            section = highlightStyleSection
+            section = outlineAndTextConfiguration
     )
     @Range()
     default int borderWidth()
     {
         return 2;
+    }
+
+    @ConfigItem(
+            keyName = "stationTextOffset",
+            name = "Station text offset",
+            description = "Offset value on the primary axis for refinement station text",
+            section = outlineAndTextConfiguration
+    )
+    @Range(min = 0, max = 300)
+    default int stationTextOffset()
+    {
+        return 100;
+    }
+
+    @ConfigItem(
+            keyName = "textSize",
+            name = "Text size",
+            description = "Text size increase for various drawn texts (excluding the overlay)",
+            section = outlineAndTextConfiguration
+    )
+    @Range(min = 0, max = 20)
+    default int textSize()
+    {
+        return 6;
+    }
+
+    @ConfigItem(
+            keyName = "prescriptionGoggles",
+            name = "Prescription goggles",
+            description = "Include Prescription goggles",
+            section = targetRewardsSection
+    )
+    default boolean prescriptionGoggles()
+    {
+        return false;
+    }
+
+    @ConfigItem(
+            keyName = "alchemistLabcoat",
+            name = "Alchemist labcoat",
+            description = "Include Alchemist labcoat",
+            section = targetRewardsSection
+    )
+    default boolean alchemistLabcoat()
+    {
+        return false;
+    }
+
+    @ConfigItem(
+            keyName = "alchemistPants",
+            name = "Alchemist pants",
+            description = "Include Alchemist pants",
+            section = targetRewardsSection
+    )
+    default boolean alchemistPants()
+    {
+        return false;
+    }
+
+    @ConfigItem(
+            keyName = "alchemistGloves",
+            name = "Alchemist gloves",
+            description = "Include Alchemist gloves",
+            section = targetRewardsSection
+    )
+    default boolean alchemistGloves()
+    {
+        return false;
+    }
+
+    @ConfigItem(
+            keyName = "Reagent pouch",
+            name = "Reagent pouch",
+            description = "Include Reagent pouch",
+            section = targetRewardsSection
+    )
+    default boolean reagentPouch()
+    {
+        return false;
+    }
+
+    @ConfigItem(
+            keyName = "potionStorage",
+            name = "Potion storage",
+            description = "Include Potion storage",
+            section = targetRewardsSection
+    )
+    default boolean potionStorage()
+    {
+        return false;
+    }
+
+    @ConfigItem(
+            keyName = "chuggingBarrel",
+            name = "Chugging barrel",
+            description = "Include Chugging barrel",
+            section = targetRewardsSection
+    )
+    default boolean chuggingBarrel()
+    {
+        return false;
+    }
+
+    @ConfigItem(
+            keyName = "alchemistsAmulet",
+            name = "Alchemist's amulet",
+            description = "Include Alchemist's amulet",
+            section = targetRewardsSection
+    )
+    default boolean alchemistsAmulet()
+    {
+        return false;
     }
 }

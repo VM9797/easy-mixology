@@ -15,7 +15,7 @@ import java.awt.*;
 
 public class EasyMixologyOverlay2D extends OverlayPanel {
     private static final int PREFERRED_WIDTH = 375;
-    private static final String MOX_COLOR = "0000FF";
+    private static final String MOX_COLOR = "6262E1";
     private static final String AGA_COLOR = "00FF00";
     private static final String LYE_COLOR = "FF0000";
 
@@ -54,9 +54,34 @@ public class EasyMixologyOverlay2D extends OverlayPanel {
 
         panelComponent.getChildren().add(LineComponent.builder()
                 .left("Player points")
-                .right(colorCodeString(stats.getPlayerMoxCount() == -1 ? "?" : String.valueOf(stats.getPlayerMoxCount()), MOX_COLOR) + " / " +
-                        colorCodeString(stats.getPlayerAgaCount() == -1 ? "?" : String.valueOf(stats.getPlayerAgaCount()), AGA_COLOR) + " / " +
+                .right(colorCodeString(stats.getPlayerMoxCount() == -1 ? "?" : String.valueOf(stats.getPlayerMoxCount()), MOX_COLOR) + " " +
+                        "/ " +
+                        colorCodeString(stats.getPlayerAgaCount() == -1 ? "?" : String.valueOf(stats.getPlayerAgaCount()), AGA_COLOR) +
+                        " / " +
                         colorCodeString(stats.getPlayerLyeCount() == -1 ? "?" : String.valueOf(stats.getPlayerLyeCount()), LYE_COLOR))
+                .build());
+
+        panelComponent.getChildren().add(LineComponent.builder()
+                .left("Target points")
+                .right(colorCodeString(String.valueOf(stats.getTargetMox()), MOX_COLOR) + " / " +
+                        colorCodeString(String.valueOf(stats.getTargetAga()), AGA_COLOR) + " / " +
+                        colorCodeString(String.valueOf(stats.getTargetLye()), LYE_COLOR))
+                .build());
+
+        if (stats.isArePlayerCountsLoaded()) {
+            panelComponent.getChildren().add(LineComponent.builder()
+                    .left("Target %")
+                    .right(colorCodeString(String.valueOf(stats.getTargetMoxPercent()), MOX_COLOR) + "% / " +
+                            colorCodeString(String.valueOf(stats.getTargetAgaPercent()), AGA_COLOR) + "% / " +
+                            colorCodeString(String.valueOf(stats.getTargetLyePercent()), LYE_COLOR) + "%")
+                    .build());
+        }
+
+        panelComponent.getChildren().add(LineComponent.builder()
+                .left("Session points")
+                .right(colorCodeString(String.valueOf(stats.getSessionMoxCount()), MOX_COLOR) + " / " +
+                        colorCodeString(String.valueOf(stats.getSessionAgaCount()), AGA_COLOR) + " / " +
+                        colorCodeString(String.valueOf(stats.getSessionLyeCount()), LYE_COLOR))
                 .build());
 
 //        panelComponent.getChildren().add(LineComponent.builder()
@@ -65,25 +90,26 @@ public class EasyMixologyOverlay2D extends OverlayPanel {
 //                .build());
 
 
-        panelComponent.getChildren().add(LineComponent.builder()
-                .left("Stage")
-                .right(state.getState().toString())
-                .build());
-
-        panelComponent.getChildren().add(LineComponent.builder()
-                .left("Refinery")
-                .right(state.getTargetRefinementType().toString())
-                .build());
-
-        panelComponent.getChildren().add(LineComponent.builder()
-                .left("Potion")
-                .right(targetPotion.toString())
-                .build());
-
-        panelComponent.getChildren().add(LineComponent.builder()
-                .left("Components")
-                .right(colorCodePotionComponent(targetPotion.firstComponent) + " / " + colorCodePotionComponent(targetPotion.secondComponent) + " / " + colorCodePotionComponent(targetPotion.thirdComponent))
-                .build());
+//        panelComponent.getChildren().add(LineComponent.builder()
+//                .left("Stage")
+//                .right(state.getState().toString())
+//                .build());
+//
+//        panelComponent.getChildren().add(LineComponent.builder()
+//                .left("Refinery")
+//                .right(state.getTargetRefinementType().toString())
+//                .build());
+//
+//        panelComponent.getChildren().add(LineComponent.builder()
+//                .left("Potion")
+//                .right(targetPotion.toString())
+//                .build());
+//
+//        panelComponent.getChildren().add(LineComponent.builder()
+//                .left("Components")
+//                .right(colorCodePotionComponent(targetPotion.firstComponent) + " / " + colorCodePotionComponent(targetPotion
+//                .secondComponent) + " / " + colorCodePotionComponent(targetPotion.thirdComponent))
+//                .build());
 
         if (config.isStationSpeedupInfoboxHighlightEnabled() && state.getState() == MixologyState.REFINING && (uiHelper.isAgitatorSpeedupObjectPresent()) || uiHelper.isAlembicSpeedupObjectPresent()) {
             panelComponent.setBackgroundColor(config.refinerySpeedupInfoboxHighlight());

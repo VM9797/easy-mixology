@@ -54,12 +54,13 @@ public class MixologyOrder {
                 Pair.of(secondPotion,
                         secondPotionRefinement),
                 Pair.of(thirdPotion, thirdPotionRefinement))
-//                .filter(it -> it.getLeft().moxValue < 30)
+                .filter(it -> !(it.getLeft().isAllMox || it.getLeft().isAllAga))
                 .sorted(Comparator.comparingInt(a -> a.getRight().orderValue))
                 .collect(Collectors.toList());
 
         if (potions.isEmpty()) {
             this.potions.add(firstPotion);
+            this.refinementTypes.add(firstPotionRefinement);
             numberOfPotionsToDo = 1;
         } else {
             for (var potion : potions) {

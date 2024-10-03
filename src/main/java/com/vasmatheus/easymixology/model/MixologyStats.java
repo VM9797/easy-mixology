@@ -1,11 +1,14 @@
 package com.vasmatheus.easymixology.model;
 
+import com.vasmatheus.easymixology.EasyMixologyConfig;
 import com.vasmatheus.easymixology.constants.MixologyVarbits;
+import com.vasmatheus.easymixology.model.enums.MixologyRewards;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.ChatMessageType;
 import net.runelite.api.Client;
 import net.runelite.api.events.ChatMessage;
+import org.apache.commons.lang3.tuple.Pair;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -22,6 +25,9 @@ public class MixologyStats {
 
     @Inject
     private MixologyStateMachine state;
+
+    @Inject
+    private EasyMixologyConfig config;
 
     @Getter
     private int hopperMoxCount = 0;
@@ -41,10 +47,43 @@ public class MixologyStats {
     @Getter
     private int playerLyeCount = -1;
 
+    @Getter
+    private int sessionMoxCount = 0;
+
+    @Getter
+    private int sessionAgaCount = 0;
+
+    @Getter
+    private int sessionLyeCount = 0;
+
+    @Getter
+    private boolean arePlayerCountsLoaded = false;
+
+    @Getter
+    private int targetMox = 0;
+
+    @Getter
+    private int targetAga = 0;
+
+    @Getter
+    private int targetLye = 0;
+
+    @Getter
+    private int targetMoxPercent = 0;
+
+    @Getter
+    private int targetAgaPercent = 0;
+
+    @Getter
+    private int targetLyePercent = 0;
+
+
+
     public void updateVarbits() {
         this.hopperMoxCount = client.getVarbitValue(MixologyVarbits.HOPPER_MOX_COUNT);
         this.hopperAgaCount = client.getVarbitValue(MixologyVarbits.HOPPER_AGA_COUNT);
         this.hopperLyeCount = client.getVarbitValue(MixologyVarbits.HOPPER_LYE_COUNT);
+        updateTargets();
     }
 
     public void processChatMessage(ChatMessage event) {
@@ -55,32 +94,98 @@ public class MixologyStats {
                 message.contains("You now have")) {
             try {
                 var playerRewardCounts = parseMatchingMessage(message);
+                var turnInCounts = playerRewardCounts.getLeft();
+                var totalCounts = playerRewardCounts.getRight();
 
-                if (playerRewardCounts.size() == 3) {
-                    playerMoxCount = playerRewardCounts.get(0);
-                    playerAgaCount = playerRewardCounts.get(1);
-                    playerLyeCount = playerRewardCounts.get(2);
+                if (totalCounts.size() == 3) {
+                    playerMoxCount = totalCounts.get(0);
+                    playerAgaCount = totalCounts.get(1);
+                    playerLyeCount = totalCounts.get(2);
+                    arePlayerCountsLoaded = true;
                 }
+
+                if (turnInCounts.size() == 3) {
+                    sessionMoxCount += turnInCounts.get(0);
+                    sessionAgaCount += turnInCounts.get(1);
+                    sessionLyeCount += turnInCounts.get(2);
+                }
+                updateTargets();
             } catch (Exception e) {
                 // Failed to parse the message, leave it for now
             }
         }
     }
 
-    private static List<Integer> parseMatchingMessage(String message) throws Exception {
-        String input = message.split("You now have")[1];
-        String regex = "<col=[^>]+>([\\d,]+)</col>";
-        Pattern pattern = Pattern.compile(regex);
-        Matcher matcher = pattern.matcher(input);
-        ArrayList<Integer> numbers = new ArrayList<>();
+    public void onConfigChanged() {
+        updateTargets();
+    }
 
-        while (matcher.find()) {
-            String numberStr = matcher.group(1);
-            numberStr = numberStr.replace(",", "");
-            int number = Integer.parseInt(numberStr);
-            numbers.add(number);
+    private void updateTargets() {
+        ArrayList<MixologyRewards> selectedRewards = new ArrayList<>();
+        targetMox = 0;
+        targetAga = 0;
+        targetLye = 0;
+
+        if (config.prescriptionGoggles()) {
+            selectedRewards.add(MixologyRewards.PrescriptionGoggles);
+        }
+        if (config.alchemistLabcoat()) {
+            selectedRewards.add(MixologyRewards.AlchemistLabcoat);
+        }
+        if (config.alchemistPants()) {
+            selectedRewards.add(MixologyRewards.AlchemistPants);
+        }
+        if (config.alchemistGloves()) {
+            selectedRewards.add(MixologyRewards.AlchemistGloves);
+        }
+        if (config.reagentPouch()) {
+            selectedRewards.add(MixologyRewards.ReagentPouch);
+        }
+        if (config.potionStorage()) {
+            selectedRewards.add(MixologyRewards.PotionStorage);
+        }
+        if (config.chuggingBarrel()) {
+            selectedRewards.add(MixologyRewards.ChuggingBarrel);
+        }
+        if (config.alchemistsAmulet()) {
+            selectedRewards.add(MixologyRewards.AlchemistsAmulet);
         }
 
-        return numbers;
+        for (var reward : selectedRewards) {
+            targetMox += reward.moxCost;
+            targetAga += reward.agaCost;
+            targetLye += reward.lyeCost;
+        }
+
+
+        targetMoxPercent = Integer.min((int)(100.0 * ((double)playerMoxCount / (double)targetMox)), 100);
+        targetAgaPercent = Integer.min((int)(100.0 * ((double)playerAgaCount / (double)targetAga)), 100);
+        targetLyePercent = Integer.min((int)(100.0 * ((double)playerLyeCount / (double)targetLye)), 100);
     }
+
+    private static Pair<List<Integer>, List<Integer>> parseMatchingMessage(String message) {
+        ArrayList<Integer> totalCount = new ArrayList<>();
+        ArrayList<Integer> turnInCount = new ArrayList<>();
+        Pair<List<Integer>, List<Integer>> result = Pair.of(turnInCount, totalCount);
+        String regex = "<col=[^>]+>([\\d,]+)</col>";
+        Pattern pattern = Pattern.compile(regex);
+        var splitMessage = message.split("You now have");
+
+        int i = 0;
+        for (var messagePart : splitMessage) {
+            Matcher matcher = pattern.matcher(messagePart);
+
+            while (matcher.find()) {
+                String numberStr = matcher.group(1);
+                numberStr = numberStr.replace(",", "");
+                int number = Integer.parseInt(numberStr);
+                (i == 0 ? turnInCount : totalCount).add(number);
+            }
+            i++;
+        }
+
+        return result;
+    }
+
+
 }
