@@ -44,6 +44,11 @@ Infobox and the herb!
 - Considering potions inventory
 
 ## Changelog
+### 1.5.1
+
+- Update default colors
+- Added bolt text option
+
 ### 1.5.0
 
 - Update overlay to display stats
