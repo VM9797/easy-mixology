@@ -15,9 +15,6 @@ import java.awt.*;
 
 public class EasyMixologyOverlay2D extends OverlayPanel {
     private static final int PREFERRED_WIDTH = 375;
-    private static final String MOX_COLOR = "6262E1";
-    private static final String AGA_COLOR = "00FF00";
-    private static final String LYE_COLOR = "FF0000";
 
     @Inject
     private MixologyStateMachine state;
@@ -54,34 +51,34 @@ public class EasyMixologyOverlay2D extends OverlayPanel {
 
         panelComponent.getChildren().add(LineComponent.builder()
                 .left("Player points")
-                .right(colorCodeString(stats.getPlayerMoxCount() == -1 ? "?" : String.valueOf(stats.getPlayerMoxCount()), MOX_COLOR) + " " +
+                .right(colorCodeString(stats.getPlayerMoxCount() == -1 ? "?" : String.valueOf(stats.getPlayerMoxCount()), getMoxColor()) + " " +
                         "/ " +
-                        colorCodeString(stats.getPlayerAgaCount() == -1 ? "?" : String.valueOf(stats.getPlayerAgaCount()), AGA_COLOR) +
+                        colorCodeString(stats.getPlayerAgaCount() == -1 ? "?" : String.valueOf(stats.getPlayerAgaCount()), getAgaColor()) +
                         " / " +
-                        colorCodeString(stats.getPlayerLyeCount() == -1 ? "?" : String.valueOf(stats.getPlayerLyeCount()), LYE_COLOR))
+                        colorCodeString(stats.getPlayerLyeCount() == -1 ? "?" : String.valueOf(stats.getPlayerLyeCount()), getLyeColor()))
                 .build());
 
         panelComponent.getChildren().add(LineComponent.builder()
                 .left("Target points")
-                .right(colorCodeString(String.valueOf(stats.getTargetMox()), MOX_COLOR) + " / " +
-                        colorCodeString(String.valueOf(stats.getTargetAga()), AGA_COLOR) + " / " +
-                        colorCodeString(String.valueOf(stats.getTargetLye()), LYE_COLOR))
+                .right(colorCodeString(String.valueOf(stats.getTargetMox()), getMoxColor()) + " / " +
+                        colorCodeString(String.valueOf(stats.getTargetAga()), getAgaColor()) + " / " +
+                        colorCodeString(String.valueOf(stats.getTargetLye()), getLyeColor()))
                 .build());
 
         if (stats.isArePlayerCountsLoaded()) {
             panelComponent.getChildren().add(LineComponent.builder()
                     .left("Target %")
-                    .right(colorCodeString(String.valueOf(stats.getTargetMoxPercent()), MOX_COLOR) + "% / " +
-                            colorCodeString(String.valueOf(stats.getTargetAgaPercent()), AGA_COLOR) + "% / " +
-                            colorCodeString(String.valueOf(stats.getTargetLyePercent()), LYE_COLOR) + "%")
+                    .right(colorCodeString(String.valueOf(stats.getTargetMoxPercent()), getMoxColor()) + "% / " +
+                            colorCodeString(String.valueOf(stats.getTargetAgaPercent()), getAgaColor()) + "% / " +
+                            colorCodeString(String.valueOf(stats.getTargetLyePercent()), getLyeColor()) + "%")
                     .build());
         }
 
         panelComponent.getChildren().add(LineComponent.builder()
                 .left("Session points")
-                .right(colorCodeString(String.valueOf(stats.getSessionMoxCount()), MOX_COLOR) + " / " +
-                        colorCodeString(String.valueOf(stats.getSessionAgaCount()), AGA_COLOR) + " / " +
-                        colorCodeString(String.valueOf(stats.getSessionLyeCount()), LYE_COLOR))
+                .right(colorCodeString(String.valueOf(stats.getSessionMoxCount()), getMoxColor()) + " / " +
+                        colorCodeString(String.valueOf(stats.getSessionAgaCount()), getAgaColor()) + " / " +
+                        colorCodeString(String.valueOf(stats.getSessionLyeCount()), getLyeColor()))
                 .build());
 
 //        panelComponent.getChildren().add(LineComponent.builder()
@@ -122,13 +119,29 @@ public class EasyMixologyOverlay2D extends OverlayPanel {
         return super.render(graphics);
     }
 
-    private static String colorCodePotionComponent(PotionComponent component) {
-        String color = component == PotionComponent.AGA ? AGA_COLOR : component == PotionComponent.LYE ? LYE_COLOR : MOX_COLOR;
+    private String colorCodePotionComponent(PotionComponent component) {
+        String color = component == PotionComponent.AGA ? getAgaColor() : component == PotionComponent.LYE ? getLyeColor() : getMoxColor();
 
         return colorCodeString(component.toString(), color);
     }
 
     private static String colorCodeString(String text, String colorCode) {
         return "<col=" + colorCode + ">" + text + "<col=FFFFFF>";
+    }
+
+    private String getMoxColor() {
+        return colorToHex(config.moxLeverOutline());
+    }
+
+    private String getAgaColor() {
+        return colorToHex(config.agaLeverOutline());
+    }
+
+    private String getLyeColor() {
+        return colorToHex(config.lyeLeverOutline());
+    }
+
+    private String colorToHex(Color color) {
+        return String.format("%02X%02X%02X", color.getRed(), color.getGreen(), color.getBlue());
     }
 }

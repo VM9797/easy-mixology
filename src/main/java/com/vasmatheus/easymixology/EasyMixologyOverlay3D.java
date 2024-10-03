@@ -200,7 +200,8 @@ public class EasyMixologyOverlay3D extends Overlay {
         Point pos = Perspective.getCanvasTextLocation(client, graphics, localPoint, text, zOffset);
 
         var originalFont = graphics.getFont();
-        var textFont = new Font(originalFont.getFontName(), originalFont.getStyle(), originalFont.getSize() + config.textSize());
+        var textFont = new Font(originalFont.getFontName(), config.boldText() ? Font.BOLD : originalFont.getStyle(),
+                originalFont.getSize() + config.textSize());
         graphics.setFont(textFont);
         OverlayUtil.renderTextLocation(graphics, pos, text, color);
         graphics.setFont(originalFont);

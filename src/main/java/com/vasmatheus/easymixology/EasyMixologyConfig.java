@@ -206,7 +206,7 @@ public interface EasyMixologyConfig extends Config {
             section = highlightColorSection
     )
     default Color moxLeverOutline() {
-        return Color.BLUE;
+        return new Color(98, 98, 255);
     }
 
     @Alpha
@@ -218,7 +218,7 @@ public interface EasyMixologyConfig extends Config {
             section = highlightColorSection
     )
     default Color agaLeverOutline() {
-        return Color.GREEN;
+        return new Color(77, 255, 71);
     }
 
     @Alpha
@@ -230,7 +230,7 @@ public interface EasyMixologyConfig extends Config {
             section = highlightColorSection
     )
     default Color lyeLeverOutline() {
-        return Color.RED;
+        return new Color(255, 72, 68);
     }
 
     @Alpha
@@ -242,7 +242,7 @@ public interface EasyMixologyConfig extends Config {
             section = highlightColorSection
     )
     default Color vesselOutline() {
-        return Color.YELLOW;
+        return new Color(255, 255, 0);
     }
 
     @Alpha
@@ -254,7 +254,7 @@ public interface EasyMixologyConfig extends Config {
             section = highlightColorSection
     )
     default Color refineryOutline() {
-        return Color.YELLOW;
+        return new Color(255, 255, 0);
     }
 
     @Alpha
@@ -266,7 +266,7 @@ public interface EasyMixologyConfig extends Config {
             section = highlightColorSection
     )
     default Color refineryPreOutline() {
-        return new Color(255, 255, 0, 90);
+        return new Color(255, 255, 0, 65);
     }
 
     @Alpha
@@ -278,7 +278,7 @@ public interface EasyMixologyConfig extends Config {
             section = highlightColorSection
     )
     default Color conveyorBeltOutline() {
-        return Color.YELLOW;
+        return new Color(255, 255, 0);
     }
 
     @Alpha
@@ -290,7 +290,7 @@ public interface EasyMixologyConfig extends Config {
             section = highlightColorSection
     )
     default Color hopperDepositNeededOutline() {
-        return Color.RED;
+        return new Color(255, 0, 0);
     }
 
     @Alpha
@@ -302,7 +302,7 @@ public interface EasyMixologyConfig extends Config {
             section = highlightColorSection
     )
     default Color refinerySpeedupOutline() {
-        return Color.CYAN;
+        return new Color(0, 255, 255);
     }
 
     @Alpha
@@ -350,7 +350,7 @@ public interface EasyMixologyConfig extends Config {
             section = highlightColorSection
     )
     default Color moxLeverPreOutline() {
-        return new Color(0, 0, 255, 100);
+        return new Color(98, 98, 255, 100);
     }
 
     @Alpha
@@ -362,7 +362,7 @@ public interface EasyMixologyConfig extends Config {
             section = highlightColorSection
     )
     default Color agaLeverPreOutline() {
-        return new Color(0, 255, 0, 100);
+        return new Color(77, 255, 71, 100);
     }
 
     @Alpha
@@ -374,7 +374,7 @@ public interface EasyMixologyConfig extends Config {
             section = highlightColorSection
     )
     default Color lyeLeverPreOutline() {
-        return new Color(255, 0, 0, 100);
+        return new Color(255, 72, 68, 100);
     }
 
     @Alpha
@@ -386,7 +386,7 @@ public interface EasyMixologyConfig extends Config {
             section = highlightColorSection
     )
     default Color conveyorBeltPreOutline() {
-        return new Color(255, 255, 0, 90);
+        return new Color(255, 255, 0, 65);
     }
 
     @ConfigItem(
@@ -438,6 +438,17 @@ public interface EasyMixologyConfig extends Config {
     default int textSize()
     {
         return 6;
+    }
+
+    @ConfigItem(
+            keyName = "boldText",
+            name = "Bold text",
+            description = "Use bold text for various drawn texts (excluding overlay)",
+            section = outlineAndTextConfiguration
+    )
+    default boolean boldText()
+    {
+        return false;
     }
 
     @ConfigItem(
