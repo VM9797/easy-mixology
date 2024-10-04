@@ -51,34 +51,34 @@ public class EasyMixologyOverlay2D extends OverlayPanel {
 
         panelComponent.getChildren().add(LineComponent.builder()
                 .left("Player points")
-                .right(colorCodeString(stats.getPlayerMoxCount() == -1 ? "?" : String.valueOf(stats.getPlayerMoxCount()), getMoxColor()) + " " +
+                .right(colorCodeString(stats.getPlayerMoxCount() == -1 ? "?" : formatInt(stats.getPlayerMoxCount()), getMoxColor()) + " " +
                         "/ " +
-                        colorCodeString(stats.getPlayerAgaCount() == -1 ? "?" : String.valueOf(stats.getPlayerAgaCount()), getAgaColor()) +
+                        colorCodeString(stats.getPlayerAgaCount() == -1 ? "?" : formatInt(stats.getPlayerAgaCount()), getAgaColor()) +
                         " / " +
-                        colorCodeString(stats.getPlayerLyeCount() == -1 ? "?" : String.valueOf(stats.getPlayerLyeCount()), getLyeColor()))
+                        colorCodeString(stats.getPlayerLyeCount() == -1 ? "?" : formatInt(stats.getPlayerLyeCount()), getLyeColor()))
                 .build());
 
         panelComponent.getChildren().add(LineComponent.builder()
                 .left("Target points")
-                .right(colorCodeString(String.valueOf(stats.getTargetMox()), getMoxColor()) + " / " +
-                        colorCodeString(String.valueOf(stats.getTargetAga()), getAgaColor()) + " / " +
-                        colorCodeString(String.valueOf(stats.getTargetLye()), getLyeColor()))
+                .right(colorCodeString(formatInt(stats.getTargetMox()), getMoxColor()) + " / " +
+                        colorCodeString(formatInt(stats.getTargetAga()), getAgaColor()) + " / " +
+                        colorCodeString(formatInt(stats.getTargetLye()), getLyeColor()))
                 .build());
 
         if (stats.isArePlayerCountsLoaded()) {
             panelComponent.getChildren().add(LineComponent.builder()
                     .left("Target %")
-                    .right(colorCodeString(String.valueOf(stats.getTargetMoxPercent()), getMoxColor()) + "% / " +
-                            colorCodeString(String.valueOf(stats.getTargetAgaPercent()), getAgaColor()) + "% / " +
-                            colorCodeString(String.valueOf(stats.getTargetLyePercent()), getLyeColor()) + "%")
+                    .right(colorCodeString(formatInt(stats.getTargetMoxPercent()), getMoxColor()) + "% / " +
+                            colorCodeString(formatInt(stats.getTargetAgaPercent()), getAgaColor()) + "% / " +
+                            colorCodeString(formatInt(stats.getTargetLyePercent()), getLyeColor()) + "%")
                     .build());
         }
 
         panelComponent.getChildren().add(LineComponent.builder()
                 .left("Session points")
-                .right(colorCodeString(String.valueOf(stats.getSessionMoxCount()), getMoxColor()) + " / " +
-                        colorCodeString(String.valueOf(stats.getSessionAgaCount()), getAgaColor()) + " / " +
-                        colorCodeString(String.valueOf(stats.getSessionLyeCount()), getLyeColor()))
+                .right(colorCodeString(formatInt(stats.getSessionMoxCount()), getMoxColor()) + " / " +
+                        colorCodeString(formatInt(stats.getSessionAgaCount()), getAgaColor()) + " / " +
+                        colorCodeString(formatInt(stats.getSessionLyeCount()), getLyeColor()))
                 .build());
 
 //        panelComponent.getChildren().add(LineComponent.builder()
@@ -143,5 +143,9 @@ public class EasyMixologyOverlay2D extends OverlayPanel {
 
     private String colorToHex(Color color) {
         return String.format("%02X%02X%02X", color.getRed(), color.getGreen(), color.getBlue());
+    }
+
+    private String formatInt(int number) {
+        return String.format("%,d", number);
     }
 }
