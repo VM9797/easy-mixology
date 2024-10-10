@@ -17,7 +17,7 @@ import java.util.stream.Stream;
 
 public class MixologyOrder {
     public static final MixologyOrder EMPTY = new MixologyOrder(Potion.NONE, Potion.NONE, Potion.NONE, RefinementType.NONE,
-            RefinementType.NONE, RefinementType.NONE, 60, PotionSelectionStrategy.REWARD_SHOP_BALANCE);
+            RefinementType.NONE, RefinementType.NONE, 60, PotionSelectionStrategy.NO_AGA_TRIPLES_UNLESS_MIXALOT);
 
     private final Potion firstPotion;
     private final Potion secondPotion;
@@ -50,11 +50,29 @@ public class MixologyOrder {
         this.playerHerbloreLevel = playerHerbloreLevel;
         this.strategy = strategy;
 
+        boolean hasMixalot = firstPotion == Potion.MIXALOT || secondPotion == Potion.MIXALOT || thirdPotion == Potion.MIXALOT;
+
         var potions = Stream.of(Pair.of(firstPotion, firstPotionRefinement),
                 Pair.of(secondPotion,
                         secondPotionRefinement),
                 Pair.of(thirdPotion, thirdPotionRefinement))
-                .filter(it -> !(it.getLeft().isAllMox || it.getLeft().isAllAga))
+                .filter(it -> {
+                    var potion = it.getLeft();
+                    switch (strategy) {
+                        case ALL_POTIONS:
+                            return true;
+                        case NO_TRIPLES:
+                            return !(potion.isAllMox || potion.isAllAga || potion.isAllLye);
+                        case NO_AGA_TRIPLES:
+                            return !(potion.isAllAga);
+                        case ONLY_LYE_TRIPLES:
+                            return !(potion.isAllAga || potion.isAllMox);
+                        case NO_AGA_TRIPLES_UNLESS_MIXALOT:
+                            return hasMixalot || !potion.isAllAga;
+                        default:
+                            return true;
+                    }
+                })
                 .sorted(Comparator.comparingInt(a -> a.getRight().orderValue))
                 .collect(Collectors.toList());
 
@@ -89,7 +107,6 @@ public class MixologyOrder {
         );
     }
 
-    // TODO: Use lombok to generate equals
     public boolean doesEqual(MixologyOrder other) {
         return firstPotion == other.firstPotion &&
                 secondPotion == other.secondPotion &&

@@ -41,16 +41,14 @@ public interface EasyMixologyConfig extends Config {
 
     @ConfigItem(
             position = 0,
-            keyName = "potionSelectionStrategy",
+            keyName = "potionSelectionStrategyV2",
             name = "Potion strategy",
-            description = "Which strategy should the plugin use to select the target potion to make. For Prefer Retort, XP is used as a " +
-                    "fallback value to select the best retort option, or the next best option if no retort is available",
-            section = optionsSection,
-            hidden = true
+            description = "Strategy to use to filter potions from order",
+            section = optionsSection
     )
     default PotionSelectionStrategy potionSelectionStrategy()
     {
-        return PotionSelectionStrategy.HIGHEST_XP;
+        return PotionSelectionStrategy.NO_AGA_TRIPLES_UNLESS_MIXALOT;
     }
 
     @ConfigItem(
