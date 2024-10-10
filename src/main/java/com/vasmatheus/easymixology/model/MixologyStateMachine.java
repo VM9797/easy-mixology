@@ -184,15 +184,15 @@ public class MixologyStateMachine {
     private void processReadyToRefineState(MixologyVariablesSnapshot nextSnapshot) {
         switch (getTargetRefinementType()) {
             case AGITATOR:
-                if (variablesSnapshot.agitatorLevel < nextSnapshot.agitatorLevel) {
+                if (variablesSnapshot.agitatorLevel < nextSnapshot.agitatorLevel || nextSnapshot.potionInAgitator == getTargetPotion()) {
                     state = MixologyState.REFINING;
                 }
             case ALEMBIC:
-                if (variablesSnapshot.alembicLevel < nextSnapshot.alembicLevel) {
+                if (variablesSnapshot.alembicLevel < nextSnapshot.alembicLevel || nextSnapshot.potionInAlembic == getTargetPotion()) {
                     state = MixologyState.REFINING;
                 }
             case RETORT:
-                if (variablesSnapshot.retortLevel < nextSnapshot.retortLevel) {
+                if (variablesSnapshot.retortLevel < nextSnapshot.retortLevel || nextSnapshot.potionInRetort == getTargetPotion()) {
                     state = MixologyState.REFINING;
                 }
         }

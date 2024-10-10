@@ -31,6 +31,10 @@ public class MixologyVarbits {
     public final static int HOPPER_AGA_COUNT = 11432;
     public final static int HOPPER_LYE_COUNT = 11433;
 
+    public final static int AGITATOR_POTION_VARBIT = 11340;
+    public final static int RETORT_POTION_VARBIT = 11341;
+    public final static int ALEMBIC_POTION_VARBIT = 11342;
+
 
     private final static List<Integer> relevantVarbits = Arrays.asList(
             MIXER_LEFT, MIXER_MIDDLE, MIXER_RIGHT,
@@ -40,7 +44,8 @@ public class MixologyVarbits {
             ORDER_SECOND_POTION, ORDER_SECOND_POTION_REFINEMENT,
             ORDER_THIRD_POTION, ORDER_THIRD_POTION_REFINEMENT,
             PLAYER_MOX_COUNT, PLAYER_AGA_COUNT, PLAYER_LYE_COUNT,
-            HOPPER_MOX_COUNT, HOPPER_AGA_COUNT, HOPPER_LYE_COUNT
+            HOPPER_MOX_COUNT, HOPPER_AGA_COUNT, HOPPER_LYE_COUNT,
+            AGITATOR_POTION_VARBIT, RETORT_POTION_VARBIT, ALEMBIC_POTION_VARBIT
     );
 
     // TODO: Reward varbits are -1?

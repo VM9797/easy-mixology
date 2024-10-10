@@ -108,6 +108,11 @@ public class EasyMixologyOverlay2D extends OverlayPanel {
 //                .secondComponent) + " / " + colorCodePotionComponent(targetPotion.thirdComponent))
 //                .build());
 
+
+        if (config.isRefiningInfoboxHighlightEnabled() && state.getState() == MixologyState.REFINING) {
+            panelComponent.setBackgroundColor(config.infoboxRefiningHighlight());
+        }
+
         if (config.isStationSpeedupInfoboxHighlightEnabled() && state.getState() == MixologyState.REFINING && (uiHelper.isAgitatorSpeedupObjectPresent()) || uiHelper.isAlembicSpeedupObjectPresent()) {
             panelComponent.setBackgroundColor(config.refinerySpeedupInfoboxHighlight());
         }

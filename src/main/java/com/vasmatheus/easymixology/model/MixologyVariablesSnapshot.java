@@ -3,8 +3,10 @@ package com.vasmatheus.easymixology.model;
 import com.vasmatheus.easymixology.constants.MixologyVarbits;
 import com.vasmatheus.easymixology.model.enums.Potion;
 import com.vasmatheus.easymixology.model.enums.PotionComponent;
+import lombok.AllArgsConstructor;
 import net.runelite.api.Client;
 
+@AllArgsConstructor
 public class MixologyVariablesSnapshot {
     public static final MixologyVariablesSnapshot EMPTY = new MixologyVariablesSnapshot(
             Potion.NONE,
@@ -13,7 +15,10 @@ public class MixologyVariablesSnapshot {
             0,
             PotionComponent.NONE,
             PotionComponent.NONE,
-            PotionComponent.NONE
+            PotionComponent.NONE,
+            Potion.NONE,
+            Potion.NONE,
+            Potion.NONE
     );
 
     public final Potion potionInVessel;
@@ -23,19 +28,9 @@ public class MixologyVariablesSnapshot {
     public final PotionComponent componentInFirstMixer;
     public final PotionComponent componentInSecondMixer;
     public final PotionComponent componentInThirdMixer;
-
-
-    private MixologyVariablesSnapshot(Potion potionInVessel, int agitatorLevel, int retortLevel, int alembicLevel,
-                                      PotionComponent componentInFirstMixer, PotionComponent componentInSecondMixer,
-                                      PotionComponent componentInThirdMixer) {
-        this.potionInVessel = potionInVessel;
-        this.agitatorLevel = agitatorLevel;
-        this.retortLevel = retortLevel;
-        this.alembicLevel = alembicLevel;
-        this.componentInFirstMixer = componentInFirstMixer;
-        this.componentInSecondMixer = componentInSecondMixer;
-        this.componentInThirdMixer = componentInThirdMixer;
-    }
+    public final Potion potionInAlembic;
+    public final Potion potionInAgitator;
+    public final Potion potionInRetort;
 
     public static MixologyVariablesSnapshot fromVarbits(Client client) {
         return new MixologyVariablesSnapshot(
@@ -45,7 +40,10 @@ public class MixologyVariablesSnapshot {
                 client.getVarbitValue(MixologyVarbits.REFINER_ALEMBIC),
                 PotionComponent.fromVarbitValue(client.getVarbitValue(MixologyVarbits.MIXER_LEFT)),
                 PotionComponent.fromVarbitValue(client.getVarbitValue(MixologyVarbits.MIXER_MIDDLE)),
-                PotionComponent.fromVarbitValue(client.getVarbitValue(MixologyVarbits.MIXER_RIGHT))
+                PotionComponent.fromVarbitValue(client.getVarbitValue(MixologyVarbits.MIXER_RIGHT)),
+                Potion.fromVarbitValue(client.getVarbitValue(MixologyVarbits.ALEMBIC_POTION_VARBIT)),
+                Potion.fromVarbitValue(client.getVarbitValue(MixologyVarbits.AGITATOR_POTION_VARBIT)),
+                Potion.fromVarbitValue(client.getVarbitValue(MixologyVarbits.RETORT_POTION_VARBIT))
         );
     }
 }

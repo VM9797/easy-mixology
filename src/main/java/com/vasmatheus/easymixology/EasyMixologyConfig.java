@@ -195,6 +195,18 @@ public interface EasyMixologyConfig extends Config {
         return true;
     }
 
+    @ConfigItem(
+            position = 13,
+            keyName = "isRefiningInfoboxHighlightEnabled",
+            name = "Overlay refining highlight",
+            description = "Enables the highlighting of the infobox while refinining",
+            section = optionsSection
+    )
+    default boolean isRefiningInfoboxHighlightEnabled()
+    {
+        return true;
+    }
+
 
     @Alpha
     @ConfigItem(
@@ -386,6 +398,18 @@ public interface EasyMixologyConfig extends Config {
     )
     default Color conveyorBeltPreOutline() {
         return new Color(255, 255, 0, 65);
+    }
+
+    @Alpha
+    @ConfigItem(
+            position = 16,
+            keyName = "infoboxRefiningHighlight",
+            name = "Infobox refining highlight",
+            description = "Color to use to highlight the infobox when refining is in progress",
+            section = highlightColorSection
+    )
+    default Color infoboxRefiningHighlight() {
+        return new Color(219, 152, 4, 55);
     }
 
     @ConfigItem(
