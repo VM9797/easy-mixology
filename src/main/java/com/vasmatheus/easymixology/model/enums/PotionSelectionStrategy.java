@@ -11,15 +11,15 @@ public enum PotionSelectionStrategy {
     public String toString() {
         switch (this) {
             case ALL_POTIONS:
-                return "Always 3 potions";
+                return "Make all";
             case NO_TRIPLES:
-                return "No 3 component potions";
+                return "No triples";
             case ONLY_LYE_TRIPLES:
-                return "Only keep LLL triple potions";
+                return "No AAA/MMM";
             case NO_AGA_TRIPLES:
-                return "Only discard AAA triple potions";
+                return "No AAA";
             case NO_AGA_TRIPLES_UNLESS_MIXALOT:
-                return "Only discard AAA triple potions, unless mixalot is in order";
+                return "No AAA except when Mixalot";
             default:
                 return name();
         }

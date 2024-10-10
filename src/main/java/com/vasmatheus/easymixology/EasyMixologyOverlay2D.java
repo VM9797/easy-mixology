@@ -109,16 +109,16 @@ public class EasyMixologyOverlay2D extends OverlayPanel {
 //                .build());
 
 
-        if (config.isRefiningInfoboxHighlightEnabled() && state.getState() == MixologyState.REFINING) {
-            panelComponent.setBackgroundColor(config.infoboxRefiningHighlight());
+        if (config.isRefiningOverlayHighlightEnabled() && state.getState() == MixologyState.REFINING) {
+            panelComponent.setBackgroundColor(config.overlayRefiningHighlight());
         }
 
-        if (config.isStationSpeedupInfoboxHighlightEnabled() && state.getState() == MixologyState.REFINING && (uiHelper.isAgitatorSpeedupObjectPresent()) || uiHelper.isAlembicSpeedupObjectPresent()) {
-            panelComponent.setBackgroundColor(config.refinerySpeedupInfoboxHighlight());
+        if (config.isStationSpeedupOverlayHighlightEnabled() && state.getState() == MixologyState.REFINING && (uiHelper.isAgitatorSpeedupObjectPresent()) || uiHelper.isAlembicSpeedupObjectPresent()) {
+            panelComponent.setBackgroundColor(config.refinerySpeedupOverlayHighlight());
         }
 
-        if (config.isDigweedInfoboxHighlightEnabled() && uiHelper.isMatureDigweedPresent()) {
-            panelComponent.setBackgroundColor(config.digweedInfoboxHighlight());
+        if (config.isDigweedOverlayHighlightEnabled() && uiHelper.isMatureDigweedPresent()) {
+            panelComponent.setBackgroundColor(config.digweedOverlayHighlight());
         }
 
         return super.render(graphics);

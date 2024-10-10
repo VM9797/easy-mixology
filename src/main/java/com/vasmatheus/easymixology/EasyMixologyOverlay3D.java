@@ -17,6 +17,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class EasyMixologyOverlay3D extends Overlay {
+    private static final int HOPPER_THRESHOLD = 100;
+
     @Inject
     private ModelOutlineRenderer modelOutlineRenderer;
 
@@ -89,7 +91,7 @@ public class EasyMixologyOverlay3D extends Overlay {
     }
 
     private void outlineDigweed() {
-        if (!config.isDigweedHighlightEnabled() || !uiHelper.isMatureDigweedPresent()) {
+        if (!config.isDigweedOutlineEnabled() || !uiHelper.isMatureDigweedPresent()) {
             return;
         }
 
@@ -98,6 +100,10 @@ public class EasyMixologyOverlay3D extends Overlay {
 
     private void outlineRefinery(boolean preDraw, boolean preDrawNext, Graphics2D graphics) {
         if (agitator == null || alembic == null || retort == null) {
+            return;
+        }
+
+        if (preDraw && !config.isRefineryPreOutlineEnabled()) {
             return;
         }
 
@@ -112,11 +118,11 @@ public class EasyMixologyOverlay3D extends Overlay {
                 secondaryTargetRefinement == RefinementType.ALEMBIC ? alembic : secondaryTargetRefinement == RefinementType.RETORT ?
                         retort : null;
 
-        if (secondaryTargetRefinery != null && secondaryTargetRefinery != primaryTargetRefinery) {
+        if (secondaryTargetRefinery != null && secondaryTargetRefinery != primaryTargetRefinery && config.isRefineryPreOutlineEnabled()) {
             outlineObject(secondaryTargetRefinery, config.refineryPreOutline());
         }
 
-        if (config.isStationProcessCountEnabled() && !preDraw) {
+        if (config.isRefineryProcessCountEnabled() && !preDraw) {
             var stationOffset = config.stationTextOffset();
             int xOffset = primaryTargetRefinement == RefinementType.ALEMBIC ? -stationOffset : primaryTargetRefinement == RefinementType.RETORT ?
                     (stationOffset / 2) : 0;
@@ -127,16 +133,16 @@ public class EasyMixologyOverlay3D extends Overlay {
                     config.refineryOutline(), graphics, xOffset, yOffset, zOffset);
         }
 
-        if (primaryTargetRefinery == alembic && config.isStationSpeedupHighlightEnabled() && uiHelper.isAlembicSpeedupObjectPresent()) {
+        if (primaryTargetRefinery == alembic && config.isRefinerySpeedupOutlineEnabled() && uiHelper.isAlembicSpeedupObjectPresent()) {
             outlineObject(primaryTargetRefinery, config.refinerySpeedupOutline());
             return;
         }
-        else if (primaryTargetRefinery == agitator && config.isStationSpeedupHighlightEnabled() && uiHelper.isAgitatorSpeedupObjectPresent()) {
+        else if (primaryTargetRefinery == agitator && config.isRefinerySpeedupOutlineEnabled() && uiHelper.isAgitatorSpeedupObjectPresent()) {
             outlineObject(primaryTargetRefinery, config.refinerySpeedupOutline());
             return;
         }
 
-        if (!config.isStationHighlightEnabled()) {
+        if (!config.isRefineryOutlineEnabled()) {
             return;
         }
 
@@ -144,7 +150,7 @@ public class EasyMixologyOverlay3D extends Overlay {
     }
 
     private void outlineVessel() {
-        if (vessel == null || !config.isVesselHighlightEnabled()) {
+        if (vessel == null || !config.isVesselOutlineEnabled()) {
             return;
         }
 
@@ -157,19 +163,19 @@ public class EasyMixologyOverlay3D extends Overlay {
 
         for (var component : componentsToAdd) {
             if (component == PotionComponent.LYE && lyeLever != null && pullCountMap.get(component) != 0) {
-                outlineTargetLever(lyeLever, preDraw ? config.lyeLeverPreOutline() : config.lyeLeverOutline());
+                outlineTargetLever(lyeLever, preDraw ? config.lyeLeverPreOutline() : config.lyeLeverOutline(), preDraw);
 
                 if (!preDraw) {
                     drawLeverPullCount(lyeLever, pullCountMap.get(component), config.lyeLeverOutline(), graphics);
                 }
             } else if (component == PotionComponent.AGA && agaLever != null && pullCountMap.get(component) != 0) {
-                outlineTargetLever(agaLever, preDraw ? config.agaLeverPreOutline() : config.agaLeverOutline());
+                outlineTargetLever(agaLever, preDraw ? config.agaLeverPreOutline() : config.agaLeverOutline(), preDraw);
 
                 if (!preDraw) {
                     drawLeverPullCount(agaLever, pullCountMap.get(component), config.agaLeverOutline(), graphics);
                 }
             } else if (component == PotionComponent.MOX && moxLever != null && pullCountMap.get(component) != 0) {
-                outlineTargetLever(moxLever, preDraw ? config.moxLeverPreOutline() : config.moxLeverOutline());
+                outlineTargetLever(moxLever, preDraw ? config.moxLeverPreOutline() : config.moxLeverOutline(), preDraw);
 
                 if (!preDraw) {
                     drawLeverPullCount(moxLever, pullCountMap.get(component), config.moxLeverOutline(), graphics);
@@ -178,8 +184,12 @@ public class EasyMixologyOverlay3D extends Overlay {
         }
     }
 
-    private void outlineTargetLever(TileObject lever, Color color) {
-        if (!config.isLeverHighlightEnabled()) {
+    private void outlineTargetLever(TileObject lever, Color color, boolean preDraw) {
+        if (!config.isLeverOutlineEnabled()) {
+            return;
+        }
+
+        if (preDraw && !config.isLeverPreOutlineEnabled()) {
             return;
         }
 
@@ -210,7 +220,11 @@ public class EasyMixologyOverlay3D extends Overlay {
     }
 
     private void drawConveyorBelt(boolean preDraw) {
-        if (!config.isConveyorBeltHighlightEnabled()) {
+        if (!config.isConveyorBeltOutlineEnabled()) {
+            return;
+        }
+
+        if (preDraw && !config.isConveyorBeltPreOutlineEnabled()) {
             return;
         }
 
@@ -220,7 +234,7 @@ public class EasyMixologyOverlay3D extends Overlay {
     }
 
     private void outlineHopper() {
-        if (hopper == null || !isHopperOutlineNeeded() || !config.isEmptyHopperHighlightEnabled()) {
+        if (hopper == null || !isHopperOutlineNeeded() || !config.isEmptyHopperOutlineEnabled()) {
             return;
         }
 
@@ -232,8 +246,7 @@ public class EasyMixologyOverlay3D extends Overlay {
     }
 
     private boolean isHopperOutlineNeeded() {
-        var potion = state.getTargetPotion();
-        return potion.moxPasteRequirement > stats.getHopperMoxCount() || potion.agaPasteRequirement > stats.getHopperAgaCount() || potion.lyePasteRequirement > stats.getHopperLyeCount();
+        return HOPPER_THRESHOLD > stats.getHopperMoxCount() || HOPPER_THRESHOLD > stats.getHopperAgaCount() || HOPPER_THRESHOLD > stats.getHopperLyeCount();
     }
 
 }
