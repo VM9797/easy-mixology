@@ -177,6 +177,7 @@ public class EasyMixologyPlugin extends Plugin {
     public void onGameTick(GameTick event) {
         Widget mixologyWidget = client.getWidget(MixologyIDs.MIXOLOGY_WIDGET_ID);
         state.onTickUpdate();
+        uiHelper.onTick();
 
         if (mixologyWidget != null) {
             inArea = true;

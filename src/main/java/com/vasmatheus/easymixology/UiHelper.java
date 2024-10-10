@@ -15,17 +15,37 @@ public class UiHelper {
     @Inject
     private Client client;
 
+    private long tickCounter = 0;
+    private long alembicSpeedupObjectSpawnTick = -1;
+
     public GameObject digweedNE;
     public GameObject digweedSE;
     public GameObject digweedSW;
     public GameObject digweedNW;
 
+    public void onTick() {
+        tickCounter++;
+    }
+
     public boolean isAgitatorSpeedupObjectPresent() {
         return isGraphicsObjectPresent(MixologyIDs.AGITATOR_SPEEDUP_OBJECT_ID);
     }
 
+    // The indicator object lives for an extra tick compared to the action window, thus it has to be manually tracked for it's lifespan
     public boolean isAlembicSpeedupObjectPresent() {
-        return isGraphicsObjectPresent(MixologyIDs.ALEMBIC_SPEEDUP_OBJECT_ID);
+        var isPresent = isGraphicsObjectPresent(MixologyIDs.ALEMBIC_SPEEDUP_OBJECT_ID);
+
+        if (isPresent && alembicSpeedupObjectSpawnTick == -1) {
+            alembicSpeedupObjectSpawnTick = tickCounter;
+            return true;
+        } else if (isPresent && alembicSpeedupObjectSpawnTick + 1 == tickCounter) {
+            return true;
+        } else if (isPresent) {
+            return false;
+        }
+
+        alembicSpeedupObjectSpawnTick = -1;
+        return false;
     }
 
     public boolean isMatureDigweedPresent() {
