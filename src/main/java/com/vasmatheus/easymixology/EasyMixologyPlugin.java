@@ -52,6 +52,9 @@ public class EasyMixologyPlugin extends Plugin {
     @Inject
     private ClientThread clientThread;
 
+    @Inject
+    private EasyMixologyLeftClickSwapper leftClickSwapper;
+
     private int areaBootstrapTickCounter = AREA_BOOTSTRAP_TICK_COUNTER_START;
     private boolean inArea = false;
 
@@ -196,6 +199,12 @@ public class EasyMixologyPlugin extends Plugin {
                 state.stop();
             }
         }
+    }
+
+    @Subscribe
+    public void onClientTick(ClientTick clientTick)
+    {
+        leftClickSwapper.updateLeftClickOptions();
     }
 
     @Subscribe

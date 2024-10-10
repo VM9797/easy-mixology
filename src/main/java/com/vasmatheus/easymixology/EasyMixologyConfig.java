@@ -207,6 +207,19 @@ public interface EasyMixologyConfig extends Config {
         return true;
     }
 
+    @ConfigItem(
+            position = 14,
+            keyName = "isLeftClickSwapForAgitatorWhenDepositEnabled",
+            name = "Walk through agitator",
+            description = "Switch the left click option on agitator to walk through it when ready to deposit the order (useful when " +
+                    "facing north)",
+            section = optionsSection
+    )
+    default boolean isLeftClickSwapForAgitatorWhenDepositEnabled()
+    {
+        return true;
+    }
+
 
     @Alpha
     @ConfigItem(
