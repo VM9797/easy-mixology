@@ -44,6 +44,16 @@ Infobox and the herb!
 - Considering potions inventory
 
 ## Changelog
+### 1.6.0
+
+- Improved overlay numeric value display
+- Fine-tuned default color options
+- Restructure configuration
+- Added option to walk through agitator when ready to deposit order (useful when facing north)
+- Updated strategies to incentivise 3 potion orders (with the option to discard triple potions)
+- Fixed Alembic speedup indicator showing for 1 tick longer than the action window is 
+- Fixed lever texts popping up between state changes
+ 
 ### 1.5.2
 
 - Add consumable rewards to reward targets
