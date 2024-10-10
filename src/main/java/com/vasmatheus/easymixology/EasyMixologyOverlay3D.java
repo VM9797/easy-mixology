@@ -54,6 +54,8 @@ public class EasyMixologyOverlay3D extends Overlay {
             return null;
         }
 
+        state.updateLeversToPull();
+
         switch (state.getState()) {
             case MIXING:
                 outlineLevers(graphics, false);
@@ -117,8 +119,8 @@ public class EasyMixologyOverlay3D extends Overlay {
         if (config.isStationProcessCountEnabled() && !preDraw) {
             var stationOffset = config.stationTextOffset();
             int xOffset = primaryTargetRefinement == RefinementType.ALEMBIC ? -stationOffset : primaryTargetRefinement == RefinementType.RETORT ?
-                    stationOffset : 0;
-            int yOffset = primaryTargetRefinement == RefinementType.AGITATOR ? stationOffset : 0;
+                    (stationOffset / 2) : 0;
+            int yOffset = primaryTargetRefinement == RefinementType.AGITATOR ? (int)((double)stationOffset * 1.5) : stationOffset / 2;
             int zOffset = 250;
 
             drawTextAtObject(primaryTargetRefinery, String.format("%dx", state.getRefinementTypeCountMap().get(primaryTargetRefinement)),
@@ -191,7 +193,7 @@ public class EasyMixologyOverlay3D extends Overlay {
             return;
         }
 
-        drawTextAtObject(targetLever, String.format("%dx", pullCount), color, graphics, 0, 0, 250);
+        drawTextAtObject(targetLever, String.format("%dx", pullCount), color, graphics, 0, 100, 250);
     }
 
     private void drawTextAtObject(TileObject object, String text, Color color, Graphics2D graphics, int xOffset, int yOffset, int zOffset) {

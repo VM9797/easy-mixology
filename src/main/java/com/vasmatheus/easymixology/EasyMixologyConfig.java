@@ -349,7 +349,7 @@ public interface EasyMixologyConfig extends Config {
             section = highlightColorSection
     )
     default Color moxLeverPreOutline() {
-        return new Color(98, 98, 255, 100);
+        return new Color(98, 98, 255, 135);
     }
 
     @Alpha
@@ -361,7 +361,7 @@ public interface EasyMixologyConfig extends Config {
             section = highlightColorSection
     )
     default Color agaLeverPreOutline() {
-        return new Color(77, 255, 71, 100);
+        return new Color(77, 255, 71, 135);
     }
 
     @Alpha
@@ -373,7 +373,7 @@ public interface EasyMixologyConfig extends Config {
             section = highlightColorSection
     )
     default Color lyeLeverPreOutline() {
-        return new Color(255, 72, 68, 100);
+        return new Color(255, 72, 68, 135);
     }
 
     @Alpha

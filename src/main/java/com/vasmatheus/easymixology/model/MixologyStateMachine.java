@@ -96,6 +96,8 @@ public class MixologyStateMachine {
         if (state == MixologyState.MIXING) {
             updateLeversToPull();
         }
+
+        onVarbitUpdate();
     }
 
     public void onVarbitUpdate() {
@@ -130,7 +132,7 @@ public class MixologyStateMachine {
 
     }
 
-    private void updateLeversToPull() {
+    public void updateLeversToPull() {
         var targetPotion = getTargetPotion();
         var nextPotion = currentlyProcessingPotionIndex == getLastPotionIndex() ? null : order.potions.get(currentlyProcessingPotionIndex + 1);
 
