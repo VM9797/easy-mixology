@@ -124,9 +124,10 @@ public class EasyMixologyOverlay3D extends Overlay {
 
         if (config.isRefineryProcessCountEnabled() && !preDraw) {
             var stationOffset = config.stationTextOffset();
-            int xOffset = primaryTargetRefinement == RefinementType.ALEMBIC ? -stationOffset : primaryTargetRefinement == RefinementType.RETORT ?
+            int xOffset = primaryTargetRefinement == RefinementType.ALEMBIC ? -stationOffset :
+                    primaryTargetRefinement == RefinementType.RETORT ?
                     (stationOffset / 2) : 0;
-            int yOffset = primaryTargetRefinement == RefinementType.AGITATOR ? (int)((double)stationOffset * 1.5) : stationOffset / 2;
+            int yOffset = primaryTargetRefinement == RefinementType.AGITATOR ? (int) ((double) stationOffset * 1.5) : stationOffset / 2;
             int zOffset = 250;
 
             drawTextAtObject(primaryTargetRefinery, String.format("%dx", state.getRefinementTypeCountMap().get(primaryTargetRefinement)),
@@ -136,8 +137,7 @@ public class EasyMixologyOverlay3D extends Overlay {
         if (primaryTargetRefinery == alembic && config.isRefinerySpeedupOutlineEnabled() && uiHelper.isAlembicSpeedupObjectPresent()) {
             outlineObject(primaryTargetRefinery, config.refinerySpeedupOutline());
             return;
-        }
-        else if (primaryTargetRefinery == agitator && config.isRefinerySpeedupOutlineEnabled() && uiHelper.isAgitatorSpeedupObjectPresent()) {
+        } else if (primaryTargetRefinery == agitator && config.isRefinerySpeedupOutlineEnabled() && uiHelper.isAgitatorSpeedupObjectPresent()) {
             outlineObject(primaryTargetRefinery, config.refinerySpeedupOutline());
             return;
         }
@@ -196,10 +196,8 @@ public class EasyMixologyOverlay3D extends Overlay {
         outlineObject(lever, color);
     }
 
-    private void drawLeverPullCount(TileObject targetLever, Integer pullCount, Color color, Graphics2D graphics)
-    {
-        if (!config.isLeverPullCountTextEnabled() || pullCount == null)
-        {
+    private void drawLeverPullCount(TileObject targetLever, Integer pullCount, Color color, Graphics2D graphics) {
+        if (!config.isLeverPullCountTextEnabled() || pullCount == null) {
             return;
         }
 

@@ -202,8 +202,7 @@ public class EasyMixologyPlugin extends Plugin {
     }
 
     @Subscribe
-    public void onClientTick(ClientTick clientTick)
-    {
+    public void onClientTick(ClientTick clientTick) {
         leftClickSwapper.updateLeftClickOptions();
     }
 
@@ -221,8 +220,7 @@ public class EasyMixologyPlugin extends Plugin {
     }
 
     @Subscribe
-    public void onConfigChanged(ConfigChanged configChanged)
-    {
+    public void onConfigChanged(ConfigChanged configChanged) {
         if (configChanged.getGroup().equals(EasyMixologyConfig.GROUP)) {
             clientThread.invoke(() -> {
                 state.onVarbitUpdate();

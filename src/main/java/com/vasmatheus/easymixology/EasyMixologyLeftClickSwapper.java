@@ -36,12 +36,11 @@ public class EasyMixologyLeftClickSwapper {
         if (!config.isLeftClickSwapForAgitatorWhenDepositEnabled() ||
                 client.isMenuOpen() ||
                 !state.isStarted() ||
-                state.getState() != MixologyState.READY_TO_DEPOSIT)
-        {
+                state.getState() != MixologyState.READY_TO_DEPOSIT) {
             return;
         }
 
-        for (var menuEntry: client.getMenuEntries()) {
+        for (var menuEntry : client.getMenuEntries()) {
             var type = menuEntry.getType();
 
             if (!OBJECT_MENU_TYPES.contains(type)) {
@@ -51,8 +50,7 @@ public class EasyMixologyLeftClickSwapper {
             // Get multiloc id
             int objectId = menuEntry.getIdentifier();
             ObjectComposition objectComposition = client.getObjectDefinition(objectId);
-            if (objectComposition.getImpostorIds() != null)
-            {
+            if (objectComposition.getImpostorIds() != null) {
                 objectComposition = objectComposition.getImpostor();
                 objectId = objectComposition.getId();
             }

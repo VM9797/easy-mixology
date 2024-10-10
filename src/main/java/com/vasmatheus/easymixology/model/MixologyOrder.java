@@ -52,10 +52,11 @@ public class MixologyOrder {
 
         boolean hasMixalot = firstPotion == Potion.MIXALOT || secondPotion == Potion.MIXALOT || thirdPotion == Potion.MIXALOT;
 
-        var potions = Stream.of(Pair.of(firstPotion, firstPotionRefinement),
-                Pair.of(secondPotion,
-                        secondPotionRefinement),
-                Pair.of(thirdPotion, thirdPotionRefinement))
+        var potions = Stream.of(
+                        Pair.of(firstPotion, firstPotionRefinement),
+                        Pair.of(secondPotion, secondPotionRefinement),
+                        Pair.of(thirdPotion, thirdPotionRefinement)
+                )
                 .filter(it -> {
                     var potion = it.getLeft();
                     switch (strategy) {

@@ -134,7 +134,8 @@ public class MixologyStateMachine {
 
     public void updateLeversToPull() {
         var targetPotion = getTargetPotion();
-        var nextPotion = currentlyProcessingPotionIndex == getLastPotionIndex() ? null : order.potions.get(currentlyProcessingPotionIndex + 1);
+        var nextPotion = currentlyProcessingPotionIndex == getLastPotionIndex() ? null :
+                order.potions.get(currentlyProcessingPotionIndex + 1);
 
         var leversToPull = new ArrayList<>(Arrays.asList(targetPotion.firstComponent, targetPotion.secondComponent,
                 targetPotion.thirdComponent));
@@ -232,7 +233,7 @@ public class MixologyStateMachine {
 
     private void updateRefinementTypeCountMap() {
         var refinementTypes = order.refinementTypes;
-        for (var refinement: RefinementType.values()) {
+        for (var refinement : RefinementType.values()) {
             refinementTypeCountMap.put(refinement, 0);
         }
 

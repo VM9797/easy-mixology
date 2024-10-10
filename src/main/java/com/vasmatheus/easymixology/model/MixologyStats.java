@@ -78,7 +78,6 @@ public class MixologyStats {
     private int targetLyePercent = 0;
 
 
-
     public void updateVarbits() {
         this.hopperMoxCount = client.getVarbitValue(MixologyVarbits.HOPPER_MOX_COUNT);
         this.hopperAgaCount = client.getVarbitValue(MixologyVarbits.HOPPER_AGA_COUNT);
@@ -174,9 +173,9 @@ public class MixologyStats {
         targetLye += config.aldariumCount() * MixologyRewards.Aldarium.lyeCost;
 
 
-        targetMoxPercent = Integer.min((int)(100.0 * ((double)playerMoxCount / (double)targetMox)), 100);
-        targetAgaPercent = Integer.min((int)(100.0 * ((double)playerAgaCount / (double)targetAga)), 100);
-        targetLyePercent = Integer.min((int)(100.0 * ((double)playerLyeCount / (double)targetLye)), 100);
+        targetMoxPercent = Integer.min((int) (100.0 * ((double) playerMoxCount / (double) targetMox)), 100);
+        targetAgaPercent = Integer.min((int) (100.0 * ((double) playerAgaCount / (double) targetAga)), 100);
+        targetLyePercent = Integer.min((int) (100.0 * ((double) playerLyeCount / (double) targetLye)), 100);
     }
 
     private static Pair<List<Integer>, List<Integer>> parseMatchingMessage(String message) {
