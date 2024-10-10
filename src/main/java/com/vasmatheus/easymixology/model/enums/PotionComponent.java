@@ -4,13 +4,14 @@ import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
 public enum PotionComponent {
-    MOX("Mox", 1),
-    AGA("Aga", 2),
-    LYE("Lye", 3),
-    NONE("", 0);
+    MOX("Mox", "M", 1),
+    AGA("Aga", "A", 2),
+    LYE("Lye", "L", 3),
+    NONE("", "", 0);
 
     // Reward value is based on the amount required for the unlocks in the reward store, excluding potions
     public final String displayName;
+    public final String shortName;
     public final int varbitValue;
 
     public static PotionComponent fromVarbitValue(int varbitValue) {

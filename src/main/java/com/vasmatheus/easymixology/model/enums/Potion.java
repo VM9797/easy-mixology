@@ -1,26 +1,30 @@
 package com.vasmatheus.easymixology.model.enums;
 
+import com.google.common.collect.ImmutableList;
 import lombok.AllArgsConstructor;
+
+import java.util.List;
 
 @AllArgsConstructor
 public enum Potion {
-    MAMMOTH("Mammoth-might mix", PotionComponent.MOX, PotionComponent.MOX, PotionComponent.MOX, 1, 60, 190),
-    MYSTIC("Mystic mana amalgam", PotionComponent.MOX, PotionComponent.MOX, PotionComponent.AGA, 2, 63, 215),
-    MARLEY("Marley's moonlight", PotionComponent.MOX, PotionComponent.MOX, PotionComponent.LYE, 3, 66, 240),
-    MIXALOT("Mixalot", PotionComponent.MOX, PotionComponent.AGA, PotionComponent.LYE, 10, 81, 365),
+    MAMMOTH("Mammoth-might mix", "Mammoth", PotionComponent.MOX, PotionComponent.MOX, PotionComponent.MOX, 1, 60, 190),
+    MYSTIC("Mystic mana amalgam", "Mystic", PotionComponent.MOX, PotionComponent.MOX, PotionComponent.AGA, 2, 63, 215),
+    MARLEY("Marley's moonlight", "Marley", PotionComponent.MOX, PotionComponent.MOX, PotionComponent.LYE, 3, 66, 240),
+    MIXALOT("Mixalot", "Mixalot", PotionComponent.MOX, PotionComponent.AGA, PotionComponent.LYE, 10, 81, 365),
 
-    ALCO("Alco-augmentator", PotionComponent.AGA, PotionComponent.AGA, PotionComponent.AGA, 4, 60, 190),
-    AZURE("Azure aura mix", PotionComponent.AGA, PotionComponent.AGA, PotionComponent.MOX, 5, 69, 265),
-    AQUA("Aqualux amalgam", PotionComponent.AGA, PotionComponent.AGA, PotionComponent.LYE, 6, 72, 290),
+    ALCO("Alco-augmentator", "Alco", PotionComponent.AGA, PotionComponent.AGA, PotionComponent.AGA, 4, 60, 190),
+    AZURE("Azure aura mix", "Azure", PotionComponent.AGA, PotionComponent.AGA, PotionComponent.MOX, 5, 69, 265),
+    AQUA("Aqualux amalgam", "Aqualux", PotionComponent.AGA, PotionComponent.AGA, PotionComponent.LYE, 6, 72, 290),
 
-    LIPLACK("Liplack liquor", PotionComponent.LYE, PotionComponent.LYE, PotionComponent.LYE, 7, 60, 190),
-    MEGA("Megalite liquid", PotionComponent.LYE, PotionComponent.LYE, PotionComponent.MOX, 8, 75, 315),
-    ANTI("Anti-leech lotion", PotionComponent.LYE, PotionComponent.LYE, PotionComponent.AGA, 9, 78, 340),
+    LIPLACK("Liplack liquor", "Liplack", PotionComponent.LYE, PotionComponent.LYE, PotionComponent.LYE, 7, 60, 190),
+    MEGA("Megalite liquid", "Megalite", PotionComponent.LYE, PotionComponent.LYE, PotionComponent.MOX, 8, 75, 315),
+    ANTI("Anti-leech lotion", "Anti", PotionComponent.LYE, PotionComponent.LYE, PotionComponent.AGA, 9, 78, 340),
 
-    NONE("", PotionComponent.NONE, PotionComponent.NONE, PotionComponent.NONE, 0, 0, 0),
+    NONE("", "", PotionComponent.NONE, PotionComponent.NONE, PotionComponent.NONE, 0, 0, 0),
     ;
 
     public final String potionName;
+    public final String shortPotionName;
     public final PotionComponent firstComponent;
     public final PotionComponent secondComponent;
     public final PotionComponent thirdComponent;
@@ -36,9 +40,11 @@ public enum Potion {
     public final boolean isAllMox;
     public final boolean isAllAga;
     public final boolean isAllLye;
+    public final List<PotionComponent> componentList;
 
 
-    Potion(String potionName, PotionComponent firstComponent, PotionComponent secondComponent, PotionComponent thirdComponent,
+    Potion(String potionName, String shortPotionName,
+           PotionComponent firstComponent, PotionComponent secondComponent, PotionComponent thirdComponent,
            int varbitValue,
            int herbloreLevel, int totalXP) {
         this.firstComponent = firstComponent;
@@ -48,6 +54,7 @@ public enum Potion {
         this.herbloreLevel = herbloreLevel;
         this.totalXP = totalXP;
         this.potionName = potionName;
+        this.shortPotionName = shortPotionName;
 
         int moxCount = 0;
         int agaCount = 0;
@@ -93,6 +100,8 @@ public enum Potion {
         moxRewardValue = (isAllMox || isMixalot) ? 20 : moxCount * 10;
         agaRewardValue = (isAllAga || isMixalot) ? 20 : agaCount * 10;
         lyeRewardValue = (isAllLye || isMixalot) ? 20 : lyeCount * 10;
+
+        componentList = ImmutableList.of(firstComponent, secondComponent, thirdComponent);
     }
 
     public static Potion fromVarbitValue(int varbitValue) {

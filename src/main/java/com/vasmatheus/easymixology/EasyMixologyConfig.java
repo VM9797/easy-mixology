@@ -283,6 +283,62 @@ public interface EasyMixologyConfig extends Config {
         return new Color(32, 125, 32, 108);
     }
 
+    @ConfigItem(
+            position = 7,
+            keyName = "shouldDisplayPlayerPoints",
+            name = "Player points",
+            description = "Display player points",
+            section = overlaySection
+    )
+    default boolean shouldDisplayPlayerPoints() {
+        return true;
+    }
+
+    @ConfigItem(
+            position = 8,
+            keyName = "shouldDisplayTarget",
+            name = "Display target",
+            description = "Display reward targets",
+            section = overlaySection
+    )
+    default boolean shouldDisplayTarget() {
+        return true;
+    }
+
+
+    @ConfigItem(
+            position = 9,
+            keyName = "shouldDisplayRewardPercentage",
+            name = "Progress percentage",
+            description = "Display reward progress percentages",
+            section = overlaySection
+    )
+    default boolean shouldDisplayRewardPercentage() {
+        return true;
+    }
+
+    @ConfigItem(
+            position = 10,
+            keyName = "shouldDisplaySessionPoints",
+            name = "Display session points",
+            description = "Display session reward points",
+            section = overlaySection
+    )
+    default boolean shouldDisplaySessionPoints() {
+        return true;
+    }
+
+    @ConfigItem(
+            position = 11,
+            keyName = "shouldDisplayOrderInfo",
+            name = "Display order info",
+            description = "Display order related info in overlay",
+            section = overlaySection
+    )
+    default boolean shouldDisplayOrderInfo() {
+        return true;
+    }
+
 
     @ConfigSection(
             name = "Digweed",

@@ -1,6 +1,7 @@
 package com.vasmatheus.easymixology.constants;
 
-import java.util.Arrays;
+import com.google.common.collect.ImmutableList;
+
 import java.util.List;
 
 public class MixologyVarbits {
@@ -36,7 +37,7 @@ public class MixologyVarbits {
     public final static int ALEMBIC_POTION_VARBIT = 11342;
 
 
-    private final static List<Integer> relevantVarbits = Arrays.asList(
+    private final static List<Integer> relevantVarbits = ImmutableList.of(
             MIXER_LEFT, MIXER_MIDDLE, MIXER_RIGHT,
             VESSEL,
             REFINER_ALEMBIC, REFINER_AGITATOR, REFINER_RETORT,

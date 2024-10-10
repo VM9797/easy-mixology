@@ -20,6 +20,7 @@ public class MixologyStateMachine {
     @Inject
     private EasyMixologyConfig config;
 
+    @Getter
     private MixologyOrder order = MixologyOrder.EMPTY;
 
     @Getter

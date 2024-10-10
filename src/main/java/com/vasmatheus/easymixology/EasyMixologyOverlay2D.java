@@ -12,6 +12,8 @@ import net.runelite.client.ui.overlay.components.TitleComponent;
 
 import javax.inject.Inject;
 import java.awt.*;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class EasyMixologyOverlay2D extends OverlayPanel {
     private static final int PREFERRED_WIDTH = 375;
@@ -42,72 +44,54 @@ public class EasyMixologyOverlay2D extends OverlayPanel {
 
         panelComponent.setBackgroundColor(ComponentConstants.STANDARD_BACKGROUND_COLOR);
 
-        var targetPotion = state.getTargetPotion();
-
         panelComponent.getChildren().add(TitleComponent.builder()
                 .text("Easy Mixology")
                 .color(Color.GREEN)
                 .build());
 
-        panelComponent.getChildren().add(LineComponent.builder()
-                .left("Player points")
-                .right(colorCodeString(stats.getPlayerMoxCount() == -1 ? "?" : formatInt(stats.getPlayerMoxCount()), getMoxColor()) + " " +
-                        "/ " +
-                        colorCodeString(stats.getPlayerAgaCount() == -1 ? "?" : formatInt(stats.getPlayerAgaCount()), getAgaColor()) +
-                        " / " +
-                        colorCodeString(stats.getPlayerLyeCount() == -1 ? "?" : formatInt(stats.getPlayerLyeCount()), getLyeColor()))
-                .build());
-
-        panelComponent.getChildren().add(LineComponent.builder()
-                .left("Target points")
-                .right(colorCodeString(formatInt(stats.getTargetMox()), getMoxColor()) + " / " +
-                        colorCodeString(formatInt(stats.getTargetAga()), getAgaColor()) + " / " +
-                        colorCodeString(formatInt(stats.getTargetLye()), getLyeColor()))
-                .build());
-
-        if (stats.isArePlayerCountsLoaded()) {
+        if (config.shouldDisplayPlayerPoints()) {
             panelComponent.getChildren().add(LineComponent.builder()
-                    .left("Target %")
-                    .right(colorCodeString(formatInt(stats.getTargetMoxPercent()), getMoxColor()) + "% / " +
-                            colorCodeString(formatInt(stats.getTargetAgaPercent()), getAgaColor()) + "% / " +
-                            colorCodeString(formatInt(stats.getTargetLyePercent()), getLyeColor()) + "%")
+                    .left("Player points")
+                    .right(colorCodeString(stats.getPlayerMoxCount() == -1 ? "?" : formatInt(stats.getPlayerMoxCount()), getMoxColor()) + " " +
+                            "/ " +
+                            colorCodeString(stats.getPlayerAgaCount() == -1 ? "?" : formatInt(stats.getPlayerAgaCount()), getAgaColor()) +
+                            " / " +
+                            colorCodeString(stats.getPlayerLyeCount() == -1 ? "?" : formatInt(stats.getPlayerLyeCount()), getLyeColor()))
                     .build());
         }
 
-        panelComponent.getChildren().add(LineComponent.builder()
-                .left("Session points")
-                .right(colorCodeString(formatInt(stats.getSessionMoxCount()), getMoxColor()) + " / " +
-                        colorCodeString(formatInt(stats.getSessionAgaCount()), getAgaColor()) + " / " +
-                        colorCodeString(formatInt(stats.getSessionLyeCount()), getLyeColor()))
-                .build());
+        if (config.shouldDisplayTarget()) {
+            panelComponent.getChildren().add(LineComponent.builder()
+                    .left("Target points")
+                    .right(colorCodeString(formatInt(stats.getTargetMox()), getMoxColor()) + " / " +
+                            colorCodeString(formatInt(stats.getTargetAga()), getAgaColor()) + " / " +
+                            colorCodeString(formatInt(stats.getTargetLye()), getLyeColor()))
+                    .build());
+        }
 
-//        panelComponent.getChildren().add(LineComponent.builder()
-//                .left("Strategy")
-//                .right(config.potionSelectionStrategy().toString())
-//                .build());
+        if (config.shouldDisplayRewardPercentage()) {
+            if (stats.isArePlayerCountsLoaded()) {
+                panelComponent.getChildren().add(LineComponent.builder()
+                        .left("Target %")
+                        .right(colorCodeString(formatInt(stats.getTargetMoxPercent()), getMoxColor()) + "% / " +
+                                colorCodeString(formatInt(stats.getTargetAgaPercent()), getAgaColor()) + "% / " +
+                                colorCodeString(formatInt(stats.getTargetLyePercent()), getLyeColor()) + "%")
+                        .build());
+            }
+        }
 
+        if (config.shouldDisplaySessionPoints()) {
+            panelComponent.getChildren().add(LineComponent.builder()
+                    .left("Session points")
+                    .right(colorCodeString(formatInt(stats.getSessionMoxCount()), getMoxColor()) + " / " +
+                            colorCodeString(formatInt(stats.getSessionAgaCount()), getAgaColor()) + " / " +
+                            colorCodeString(formatInt(stats.getSessionLyeCount()), getLyeColor()))
+                    .build());
+        }
 
-//        panelComponent.getChildren().add(LineComponent.builder()
-//                .left("Stage")
-//                .right(state.getState().toString())
-//                .build());
-//
-//        panelComponent.getChildren().add(LineComponent.builder()
-//                .left("Refinery")
-//                .right(state.getTargetRefinementType().toString())
-//                .build());
-//
-//        panelComponent.getChildren().add(LineComponent.builder()
-//                .left("Potion")
-//                .right(targetPotion.toString())
-//                .build());
-//
-//        panelComponent.getChildren().add(LineComponent.builder()
-//                .left("Components")
-//                .right(colorCodePotionComponent(targetPotion.firstComponent) + " / " + colorCodePotionComponent(targetPotion
-//                .secondComponent) + " / " + colorCodePotionComponent(targetPotion.thirdComponent))
-//                .build());
-
+        if (config.shouldDisplayOrderInfo()) {
+            displayOrderInfo();
+        }
 
         if (config.isRefiningOverlayHighlightEnabled() && state.getState() == MixologyState.REFINING) {
             panelComponent.setBackgroundColor(config.overlayRefiningHighlight());
@@ -122,6 +106,74 @@ public class EasyMixologyOverlay2D extends OverlayPanel {
         }
 
         return super.render(graphics);
+    }
+
+    private void displayOrderInfo() {
+        panelComponent.getChildren().add(TitleComponent.builder()
+                .text("==========================================")
+                .build());
+
+        var processState = state.getState();
+
+        if (processState == MixologyState.READY_TO_DEPOSIT) {
+            panelComponent.getChildren().add(TitleComponent.builder()
+                    .color(Color.GREEN)
+                    .text("Ready to deposit!")
+                    .build());
+            return;
+        }
+
+        panelComponent.getChildren().add(LineComponent.builder()
+                .left("Potions")
+                .right(mapPotionListToString())
+                .build());
+
+
+        if (processState == MixologyState.MIXING || processState == MixologyState.MIX_READY) {
+            panelComponent.getChildren().add(LineComponent.builder()
+                    .left("Components")
+                    .right(mapComponentListToString())
+                    .build());
+        }
+
+        if (processState == MixologyState.REFINING || processState == MixologyState.READY_TO_REFINE) {
+            panelComponent.getChildren().add(LineComponent.builder()
+                    .left("Refinery")
+                    .right(mapRefineryListToString())
+                    .build());
+        }
+    }
+
+    private String mapPotionListToString() {
+        var order = state.getOrder();
+
+        return IntStream.range(0, order.potions.size())
+                .mapToObj(it -> it == state.getCurrentlyProcessingPotionIndex() ? colorCodeString(order.potions.get(it).potionName,
+                        colorToHex(Color.YELLOW)) : order.potions.get(it).shortPotionName)
+                .collect(Collectors.joining(" / "));
+    }
+
+    private String mapComponentListToString() {
+        var order = state.getOrder();
+
+        return order.potions.stream()
+                .map(it -> it.componentList.stream().map(this::colorCodePotionComponentShort).collect(Collectors.joining("")))
+                .collect(Collectors.joining(" / "));
+    }
+
+    private String mapRefineryListToString() {
+        var order = state.getOrder();
+
+        return IntStream.range(0, order.refinementTypes.size())
+                .mapToObj(it -> it == state.getCurrentlyProcessingPotionIndex() ? colorCodeString(order.refinementTypes.get(it).actionName,
+                        colorToHex(Color.YELLOW)) : order.refinementTypes.get(it).actionName)
+                .collect(Collectors.joining(" / "));
+    }
+
+    private String colorCodePotionComponentShort(PotionComponent component) {
+        String color = component == PotionComponent.AGA ? getAgaColor() : component == PotionComponent.LYE ? getLyeColor() : getMoxColor();
+
+        return colorCodeString(component.shortName, color);
     }
 
     private String colorCodePotionComponent(PotionComponent component) {

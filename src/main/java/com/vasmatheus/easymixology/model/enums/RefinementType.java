@@ -4,12 +4,13 @@ import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
 public enum RefinementType {
-    AGITATOR("Agitator", 1, 2),
-    RETORT("Retort", 2, 3),
-    ALEMBIC("Alembic", 3, 1),
-    NONE("", 0, 0);
+    AGITATOR("Agitator", "Homogenise", 1, 2),
+    RETORT("Retort", "Concentrate", 2, 3),
+    ALEMBIC("Alembic", "Crystallize", 3, 1),
+    NONE("", "", 0, 0);
 
     public final String displayName;
+    public final String actionName;
     public final int varbitValue;
     public final int orderValue;
 
