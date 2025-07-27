@@ -1,14 +1,22 @@
 package com.vasmatheus.seupulchrestrangetile;
 
+import com.google.inject.Provides;
 import net.runelite.api.events.GameTick;
 import net.runelite.api.events.GroundObjectDespawned;
 import net.runelite.api.events.GroundObjectSpawned;
+import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.plugins.Plugin;
+import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.ui.overlay.OverlayManager;
 
 import javax.inject.Inject;
 
+@PluginDescriptor(
+        name = "Sepulchre Strange tile marker",
+        description = "Plugin to highlight the active teleporter strange tiles in the Hallowed Sepulchre",
+        tags = {"hallowed", "sepulchre", "agility"}
+)
 public class SepulchreStrangeTileMarkerPlugin extends Plugin {
     @Inject
     private OverlayManager overlayManager;
@@ -49,5 +57,10 @@ public class SepulchreStrangeTileMarkerPlugin extends Plugin {
     @Subscribe
     public void onGameTick(GameTick event) {
         strangeTileOverlay.onTick();
+    }
+
+    @Provides
+    SepulchreStrangeTileMarkerConfig provideConfig(ConfigManager configManager) {
+        return configManager.getConfig(SepulchreStrangeTileMarkerConfig.class);
     }
 }
