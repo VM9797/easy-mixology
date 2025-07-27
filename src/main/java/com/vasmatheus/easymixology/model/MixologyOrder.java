@@ -70,6 +70,8 @@ public class MixologyOrder {
                             return !(potion.isAllAga || potion.isAllMox);
                         case NO_AGA_TRIPLES_UNLESS_MIXALOT:
                             return hasMixalot || !potion.isAllAga;
+                        case NO_AGA_MMM_TRIPLES_UNLESS_MIXALOT:
+                            return hasMixalot || !(potion.isAllAga || potion.isAllMox);
                         default:
                             return true;
                     }

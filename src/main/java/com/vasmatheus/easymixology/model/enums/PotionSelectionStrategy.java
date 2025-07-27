@@ -5,7 +5,8 @@ public enum PotionSelectionStrategy {
     NO_TRIPLES,
     ONLY_LYE_TRIPLES,
     NO_AGA_TRIPLES,
-    NO_AGA_TRIPLES_UNLESS_MIXALOT;
+    NO_AGA_TRIPLES_UNLESS_MIXALOT,
+    NO_AGA_MMM_TRIPLES_UNLESS_MIXALOT;
 
     @Override
     public String toString() {
@@ -20,6 +21,8 @@ public enum PotionSelectionStrategy {
                 return "No AAA";
             case NO_AGA_TRIPLES_UNLESS_MIXALOT:
                 return "No AAA except when Mixalot";
+            case NO_AGA_MMM_TRIPLES_UNLESS_MIXALOT:
+                return "No AAA/MMM except when Mixalot";
             default:
                 return name();
         }

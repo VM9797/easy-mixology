@@ -19,6 +19,7 @@ import net.runelite.client.ui.overlay.OverlayManager;
 
 import javax.inject.Inject;
 
+// TODO For next time: Add menu entry for vessel to skip ahead/track back a potion, add option to darken overlay maybe
 @Slf4j
 @PluginDescriptor(
         name = "Easy Mixology",
