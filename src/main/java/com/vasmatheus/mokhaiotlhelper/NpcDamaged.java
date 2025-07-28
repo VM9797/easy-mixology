@@ -10,6 +10,7 @@ import net.runelite.client.party.messages.PartyMemberMessage;
 public class NpcDamaged extends PartyMemberMessage {
   @SerializedName("i")
   int npcIndex;
+
   @SerializedName("d")
   int damage;
 }

@@ -5,6 +5,7 @@ import com.vasmatheus.easymixology.constants.MixologyIDs;
 import com.vasmatheus.easymixology.constants.MixologyVarbits;
 import com.vasmatheus.easymixology.model.MixologyStateMachine;
 import com.vasmatheus.easymixology.model.MixologyStats;
+import javax.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
 import net.runelite.api.events.*;
@@ -17,222 +18,224 @@ import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.ui.overlay.OverlayManager;
 
-import javax.inject.Inject;
-
-// TODO For next time: Add menu entry for vessel to skip ahead/track back a potion, add option to darken overlay maybe
+// TODO For next time: Add menu entry for vessel to skip ahead/track back a potion, add option to
+// darken overlay maybe
 @Slf4j
 @PluginDescriptor(
-        name = "Easy Mixology",
-        description = "Helper plugin to improve experience for Mastering Mixology minigame",
-        tags = {"mastering", "mixology", "minigame", "herblore", "alchemy", "lab", "herb", "paste", "mox", "lye", "aga", "potion"}
-)
+    name = "Easy Mixology",
+    description = "Helper plugin to improve experience for Mastering Mixology minigame",
+    tags = {
+      "mastering",
+      "mixology",
+      "minigame",
+      "herblore",
+      "alchemy",
+      "lab",
+      "herb",
+      "paste",
+      "mox",
+      "lye",
+      "aga",
+      "potion"
+    })
 public class EasyMixologyPlugin extends Plugin {
-    private static final int AREA_BOOTSTRAP_TICK_COUNTER_START = 3;
+  private static final int AREA_BOOTSTRAP_TICK_COUNTER_START = 3;
 
-    @Inject
-    private Client client;
+  @Inject private Client client;
 
-    @Inject
-    private MixologyStateMachine state;
+  @Inject private MixologyStateMachine state;
 
-    @Inject
-    private MixologyStats stats;
+  @Inject private MixologyStats stats;
 
-    @Inject
-    private EasyMixologyOverlay3D overlay3D;
+  @Inject private EasyMixologyOverlay3D overlay3D;
 
-    @Inject
-    private EasyMixologyOverlay2D overlay2D;
+  @Inject private EasyMixologyOverlay2D overlay2D;
 
-    @Inject
-    private UiHelper uiHelper;
+  @Inject private UiHelper uiHelper;
 
-    @Inject
-    private OverlayManager overlayManager;
+  @Inject private OverlayManager overlayManager;
 
-    @Inject
-    private ClientThread clientThread;
+  @Inject private ClientThread clientThread;
 
-    @Inject
-    private EasyMixologyLeftClickSwapper leftClickSwapper;
+  @Inject private EasyMixologyLeftClickSwapper leftClickSwapper;
 
-    private int areaBootstrapTickCounter = AREA_BOOTSTRAP_TICK_COUNTER_START;
-    private boolean inArea = false;
+  private int areaBootstrapTickCounter = AREA_BOOTSTRAP_TICK_COUNTER_START;
+  private boolean inArea = false;
 
-    @Override
-    protected void startUp() throws Exception {
-        overlayManager.add(overlay3D);
-        overlayManager.add(overlay2D);
+  @Override
+  protected void startUp() throws Exception {
+    overlayManager.add(overlay3D);
+    overlayManager.add(overlay2D);
+  }
+
+  @Override
+  protected void shutDown() throws Exception {
+    overlayManager.remove(overlay3D);
+    overlayManager.remove(overlay2D);
+  }
+
+  @Subscribe
+  public void onDecorativeObjectSpawned(DecorativeObjectSpawned event) {
+    var object = event.getDecorativeObject();
+
+    if (object.getId() == MixologyIDs.AGA_LEVER) {
+      overlay3D.agaLever = object;
     }
+  }
 
-    @Override
-    protected void shutDown() throws Exception {
-        overlayManager.remove(overlay3D);
-        overlayManager.remove(overlay2D);
+  @Subscribe
+  public void onDecorativeObjectDespawned(DecorativeObjectDespawned event) {
+    var object = event.getDecorativeObject();
+
+    if (object.getId() == MixologyIDs.AGA_LEVER) {
+      overlay3D.agaLever = null;
     }
+  }
 
-    @Subscribe
-    public void onDecorativeObjectSpawned(DecorativeObjectSpawned event) {
-        var object = event.getDecorativeObject();
+  @Subscribe
+  public void onGameObjectSpawned(GameObjectSpawned event) {
+    var object = event.getGameObject();
 
-        if (object.getId() == MixologyIDs.AGA_LEVER) {
-            overlay3D.agaLever = object;
+    switch (object.getId()) {
+      case MixologyIDs.CONVEYOR_BELT:
+        overlay3D.conveyorBelts.add(object);
+        break;
+      case MixologyIDs.LYE_LEVER:
+        overlay3D.lyeLever = object;
+        break;
+      case MixologyIDs.MOX_LEVER:
+        overlay3D.moxLever = object;
+        break;
+      case MixologyIDs.ALEMBIC:
+        overlay3D.alembic = object;
+        break;
+      case MixologyIDs.AGITATOR:
+        overlay3D.agitator = object;
+        break;
+      case MixologyIDs.RETORT:
+        overlay3D.retort = object;
+        break;
+      case MixologyIDs.VESSEL:
+        overlay3D.vessel = object;
+        break;
+      case MixologyIDs.HOPPER:
+        overlay3D.hopper = object;
+        break;
+      case MixologyIDs.DIGWEED_NE:
+        uiHelper.digweedNE = object;
+        break;
+      case MixologyIDs.DIGWEED_SE:
+        uiHelper.digweedSE = object;
+        break;
+      case MixologyIDs.DIGWEED_SW:
+        uiHelper.digweedSW = object;
+        break;
+      case MixologyIDs.DIGWEED_NW:
+        uiHelper.digweedNW = object;
+        break;
+    }
+  }
+
+  @Subscribe
+  public void onGameObjectDespawned(GameObjectDespawned event) {
+    var object = event.getGameObject();
+
+    switch (object.getId()) {
+      case MixologyIDs.CONVEYOR_BELT:
+        overlay3D.conveyorBelts.remove(object);
+        break;
+      case MixologyIDs.LYE_LEVER:
+        overlay3D.lyeLever = null;
+        break;
+      case MixologyIDs.MOX_LEVER:
+        overlay3D.moxLever = null;
+        break;
+      case MixologyIDs.ALEMBIC:
+        overlay3D.alembic = null;
+        break;
+      case MixologyIDs.AGITATOR:
+        overlay3D.agitator = null;
+        break;
+      case MixologyIDs.RETORT:
+        overlay3D.retort = null;
+        break;
+      case MixologyIDs.VESSEL:
+        overlay3D.vessel = null;
+        break;
+      case MixologyIDs.HOPPER:
+        overlay3D.hopper = null;
+        break;
+      case MixologyIDs.DIGWEED_NE:
+        uiHelper.digweedNE = null;
+        break;
+      case MixologyIDs.DIGWEED_SE:
+        uiHelper.digweedSE = null;
+        break;
+      case MixologyIDs.DIGWEED_SW:
+        uiHelper.digweedSW = null;
+        break;
+      case MixologyIDs.DIGWEED_NW:
+        uiHelper.digweedNW = null;
+        break;
+    }
+  }
+
+  @Subscribe
+  public void onGameTick(GameTick event) {
+    Widget mixologyWidget = client.getWidget(MixologyIDs.MIXOLOGY_WIDGET_ID);
+    state.onTickUpdate();
+    uiHelper.onTick();
+
+    if (mixologyWidget != null) {
+      inArea = true;
+
+      if (areaBootstrapTickCounter >= 0) {
+        areaBootstrapTickCounter--;
+
+        if (areaBootstrapTickCounter < 0) {
+          state.start();
         }
+      }
+    } else {
+      if (inArea) {
+        inArea = false;
+        areaBootstrapTickCounter = AREA_BOOTSTRAP_TICK_COUNTER_START;
+        state.stop();
+      }
     }
+  }
 
-    @Subscribe
-    public void onDecorativeObjectDespawned(DecorativeObjectDespawned event) {
-        var object = event.getDecorativeObject();
+  @Subscribe
+  public void onClientTick(ClientTick clientTick) {
+    leftClickSwapper.updateLeftClickOptions();
+  }
 
-        if (object.getId() == MixologyIDs.AGA_LEVER) {
-            overlay3D.agaLever = null;
-        }
+  @Subscribe
+  public void onVarbitChanged(VarbitChanged event) {
+    if (MixologyVarbits.isRelevantVarbit(event.getVarbitId())) {
+      state.onVarbitUpdate();
+      stats.updateVarbits();
     }
+  }
 
-    @Subscribe
-    public void onGameObjectSpawned(GameObjectSpawned event) {
-        var object = event.getGameObject();
+  @Subscribe
+  public void onChatMessage(ChatMessage event) {
+    stats.processChatMessage(event);
+  }
 
-        switch (object.getId()) {
-            case MixologyIDs.CONVEYOR_BELT:
-                overlay3D.conveyorBelts.add(object);
-                break;
-            case MixologyIDs.LYE_LEVER:
-                overlay3D.lyeLever = object;
-                break;
-            case MixologyIDs.MOX_LEVER:
-                overlay3D.moxLever = object;
-                break;
-            case MixologyIDs.ALEMBIC:
-                overlay3D.alembic = object;
-                break;
-            case MixologyIDs.AGITATOR:
-                overlay3D.agitator = object;
-                break;
-            case MixologyIDs.RETORT:
-                overlay3D.retort = object;
-                break;
-            case MixologyIDs.VESSEL:
-                overlay3D.vessel = object;
-                break;
-            case MixologyIDs.HOPPER:
-                overlay3D.hopper = object;
-                break;
-            case MixologyIDs.DIGWEED_NE:
-                uiHelper.digweedNE = object;
-                break;
-            case MixologyIDs.DIGWEED_SE:
-                uiHelper.digweedSE = object;
-                break;
-            case MixologyIDs.DIGWEED_SW:
-                uiHelper.digweedSW = object;
-                break;
-            case MixologyIDs.DIGWEED_NW:
-                uiHelper.digweedNW = object;
-                break;
-        }
-    }
-
-    @Subscribe
-    public void onGameObjectDespawned(GameObjectDespawned event) {
-        var object = event.getGameObject();
-
-        switch (object.getId()) {
-            case MixologyIDs.CONVEYOR_BELT:
-                overlay3D.conveyorBelts.remove(object);
-                break;
-            case MixologyIDs.LYE_LEVER:
-                overlay3D.lyeLever = null;
-                break;
-            case MixologyIDs.MOX_LEVER:
-                overlay3D.moxLever = null;
-                break;
-            case MixologyIDs.ALEMBIC:
-                overlay3D.alembic = null;
-                break;
-            case MixologyIDs.AGITATOR:
-                overlay3D.agitator = null;
-                break;
-            case MixologyIDs.RETORT:
-                overlay3D.retort = null;
-                break;
-            case MixologyIDs.VESSEL:
-                overlay3D.vessel = null;
-                break;
-            case MixologyIDs.HOPPER:
-                overlay3D.hopper = null;
-                break;
-            case MixologyIDs.DIGWEED_NE:
-                uiHelper.digweedNE = null;
-                break;
-            case MixologyIDs.DIGWEED_SE:
-                uiHelper.digweedSE = null;
-                break;
-            case MixologyIDs.DIGWEED_SW:
-                uiHelper.digweedSW = null;
-                break;
-            case MixologyIDs.DIGWEED_NW:
-                uiHelper.digweedNW = null;
-                break;
-        }
-    }
-
-    @Subscribe
-    public void onGameTick(GameTick event) {
-        Widget mixologyWidget = client.getWidget(MixologyIDs.MIXOLOGY_WIDGET_ID);
-        state.onTickUpdate();
-        uiHelper.onTick();
-
-        if (mixologyWidget != null) {
-            inArea = true;
-
-            if (areaBootstrapTickCounter >= 0) {
-                areaBootstrapTickCounter--;
-
-                if (areaBootstrapTickCounter < 0) {
-                    state.start();
-                }
-            }
-        } else {
-            if (inArea) {
-                inArea = false;
-                areaBootstrapTickCounter = AREA_BOOTSTRAP_TICK_COUNTER_START;
-                state.stop();
-            }
-        }
-    }
-
-    @Subscribe
-    public void onClientTick(ClientTick clientTick) {
-        leftClickSwapper.updateLeftClickOptions();
-    }
-
-    @Subscribe
-    public void onVarbitChanged(VarbitChanged event) {
-        if (MixologyVarbits.isRelevantVarbit(event.getVarbitId())) {
+  @Subscribe
+  public void onConfigChanged(ConfigChanged configChanged) {
+    if (configChanged.getGroup().equals(EasyMixologyConfig.GROUP)) {
+      clientThread.invoke(
+          () -> {
             state.onVarbitUpdate();
-            stats.updateVarbits();
-        }
+            stats.onConfigChanged();
+          });
     }
+  }
 
-    @Subscribe
-    public void onChatMessage(ChatMessage event) {
-        stats.processChatMessage(event);
-    }
-
-    @Subscribe
-    public void onConfigChanged(ConfigChanged configChanged) {
-        if (configChanged.getGroup().equals(EasyMixologyConfig.GROUP)) {
-            clientThread.invoke(() -> {
-                state.onVarbitUpdate();
-                stats.onConfigChanged();
-            });
-        }
-    }
-
-    @Provides
-    EasyMixologyConfig provideConfig(ConfigManager configManager) {
-        return configManager.getConfig(EasyMixologyConfig.class);
-    }
+  @Provides
+  EasyMixologyConfig provideConfig(ConfigManager configManager) {
+    return configManager.getConfig(EasyMixologyConfig.class);
+  }
 }
-
