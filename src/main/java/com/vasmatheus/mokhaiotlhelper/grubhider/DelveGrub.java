@@ -1,4 +1,4 @@
-package com.vasmatheus.mokhaiotlhelper;
+package com.vasmatheus.mokhaiotlhelper.grubhider;
 
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -12,13 +12,13 @@ public class DelveGrub {
   private final NPC npc;
   private final int npcIndex;
 
-  @Setter(AccessLevel.PACKAGE)
+  @Setter(AccessLevel.PUBLIC)
   private int hp = GRUB_HP;
 
-  @Setter(AccessLevel.PACKAGE)
+  @Setter(AccessLevel.PUBLIC)
   private int queuedDamage;
 
-  @Setter(AccessLevel.PACKAGE)
+  @Setter(AccessLevel.PUBLIC)
   private int hidden;
 
   public DelveGrub(NPC npc, int npcIndex) {
